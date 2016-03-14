@@ -7,6 +7,8 @@ import net.minecraft.entity.player.EntityPlayer;
  */
 public interface IHandSpell extends ISpell {
 
+    SpellKey[] getKeyCombo();
+
     void cast(EntityPlayer player);
 
 }
