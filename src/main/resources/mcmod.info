@@ -1,0 +1,16 @@
+[
+{
+  "modid": "exomagica",
+  "name": "ExoMagica",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Guichaguri", "KronKraken"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
