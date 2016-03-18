@@ -1,13 +1,21 @@
 package exomagica.common.items;
 
 import exomagica.ExoContent;
+import exomagica.ExoMagica;
 import exomagica.api.spells.IItemSpell;
 import exomagica.api.spells.SpellType;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemSpellTest extends Item implements IItemSpell {
+
+    @SideOnly(Side.CLIENT)
+    private final ModelResourceLocation MODEL = new ModelResourceLocation(new ResourceLocation(ExoMagica.MODID, "models/items/scrol2l.json"), "inventory");
 
     public ItemSpellTest() {
         setCreativeTab(ExoContent.TAB);
@@ -22,4 +30,11 @@ public class ItemSpellTest extends Item implements IItemSpell {
     public SpellType getType() {
         return SpellType.HOLD;
     }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public ModelResourceLocation getModel(ItemStack stack, EntityPlayer player, int useRemaining) {
+        return MODEL;
+    }
+
 }

@@ -21,6 +21,8 @@ public class ExoMagica {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
+        LOG.info("Preparing...");
+        PROXY.prepare();
         LOG.info("Registering Items...");
         PROXY.registerItems();
         LOG.info("Registering Blocks...");

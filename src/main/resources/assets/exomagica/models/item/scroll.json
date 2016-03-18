@@ -1,12 +1,12 @@
 {
 "__comment": "Made by KronKraken with CubikPRO for ExoMagica Mod",
 "textures": {
-    "1": "items/scroll/1",
-    "2": "items/scroll/2",
-    "3": "items/scroll/3",
-    "4": "items/scroll/4",
-    "top": "items/scroll/top",
-    "bottom": "items/scroll/bottom"
+    "1": "exomagica:items/scroll/1",
+    "2": "exomagica:items/scroll/2",
+    "3": "exomagica:items/scroll/3",
+    "4": "exomagica:items/scroll/4",
+    "top": "exomagica:items/scroll/top",
+    "bottom": "exomagica:items/scroll/bottom"
 },
 "elements": [ 
 {
@@ -395,15 +395,20 @@
         "translation": [ 1, -1.15, 1.15 ],
         "scale": [ 1, 1, 1 ]
     },
+    "thirdperson": {
+        "rotation": [ 90, 0, 0 ],
+        "translation": [ -1, 1.15, -2 ],
+        "scale": [ 1, 1, 1 ]
+    },
     "head": {
         "rotation": [ 0, 0, 0 ],
         "translation": [ 0, 0, 0 ],
         "scale": [ 0, 0, 0 ]
     },
     "ground": {
-        "rotation": [ 90, 0, 0 ],
-        "translation": [ 0, 0, 1 ],
-        "scale": [ 1, 1, 1 ]
+        "rotation": [ 0, 0, 0 ],
+        "translation": [ 0, 0, 0 ],
+        "scale": [ 1.75, 1.75, 1.75 ]
     },
     "fixed": {
         "rotation": [ 0, 180, 45 ],
@@ -420,10 +425,15 @@
         "translation": [ 0, 0, 0 ],
         "scale": [ 1, 1, 1 ]
     },
+    "firstperson": {
+        "rotation": [ -4, -45, 20 ],
+        "translation": [ 0, 4, 0 ],
+        "scale": [ 1, 1, 1 ]
+    },
     "gui": {
-        "rotation": [ 45, 45, -45 ],
+        "rotation": [ 45, 0, -45 ],
         "translation": [ 0, 0, 0 ],
-        "scale": [ 0.9, 0.9, 0.9 ]
+        "scale": [ 1.25, 1.25, 1.25 ]
     }
 }
 }
