@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "inventory": {
+      "model": "exomagica:chalk/chalk_1"
+    },
+    "type=regular": [
+      { "model": "exomagica:chalk/chalk_1" },
+      { "model": "exomagica:chalk/chalk_2" },
+      { "model": "exomagica:chalk/chalk_3" },
+      { "model": "exomagica:chalk/chalk_4" },
+      { "model": "exomagica:chalk/chalk_5" },
+      { "model": "exomagica:chalk/chalk_6" },
+      { "model": "exomagica:chalk/chalk_7" },
+      { "model": "exomagica:chalk/chalk_8" },
+      { "model": "exomagica:chalk/chalk_9" },
+      { "model": "exomagica:chalk/chalk_10" }
+    ],
+    "type=special": [
+      { "model": "exomagica:chalk/chalk_1" },
+      { "model": "exomagica:chalk/chalk_2" },
+      { "model": "exomagica:chalk/chalk_3" },
+      { "model": "exomagica:chalk/chalk_4" },
+      { "model": "exomagica:chalk/chalk_5" },
+      { "model": "exomagica:chalk/chalk_6" },
+      { "model": "exomagica:chalk/chalk_7" },
+      { "model": "exomagica:chalk/chalk_8" },
+      { "model": "exomagica:chalk/chalk_9" },
+      { "model": "exomagica:chalk/chalk_10" }
+    ]
+  }
+}

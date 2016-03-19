@@ -1,5 +1,6 @@
 package exomagica;
 
+import exomagica.common.blocks.BlockChalk;
 import exomagica.common.items.ItemScroll;
 import exomagica.common.items.ItemSpellTest;
 import net.minecraft.creativetab.CreativeTabs;
@@ -17,5 +18,7 @@ public class ExoContent {
     public static final ItemSpellTest TEST = new ItemSpellTest();
 
     public static final ItemScroll SCROLL = new ItemScroll();
+
+    public static final BlockChalk CHALK = new BlockChalk();
 
 }
