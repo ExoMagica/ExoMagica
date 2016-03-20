@@ -4,11 +4,14 @@ import exomagica.ExoContent;
 import exomagica.ExoMagica;
 import exomagica.api.spells.IItemSpell;
 import exomagica.api.spells.SpellType;
+import exomagica.client.particles.ColorfulFX;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -23,7 +26,9 @@ public class ItemSpellTest extends Item implements IItemSpell {
 
     @Override
     public void cast(EntityPlayer player, ItemStack stack) {
-        player.addVelocity(0, 1, 0);
+        World w = player.getEntityWorld();
+        Minecraft.getMinecraft().effectRenderer.addEffect(new ColorfulFX(w, player.posX + 1, player.posY, player.posZ + 1));
+        //player.addVelocity(0, 1, 0);
     }
 
     @Override

@@ -1,9 +1,11 @@
 package exomagica.client;
 
 import exomagica.ExoContent;
+import exomagica.client.handlers.ParticleRenderer;
 import exomagica.common.CommonProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -38,6 +40,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void registerHandlers() {
         super.registerHandlers();
+        MinecraftForge.EVENT_BUS.register(new ParticleRenderer());
     }
 
 }
