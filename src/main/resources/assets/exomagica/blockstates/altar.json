@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "inventory": {
+      "model": "exomagica:altar"
+    },
+    "normal": {
+      "model": "exomagica:altar"
+    }
+  }
+}

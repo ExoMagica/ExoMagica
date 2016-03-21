@@ -4,12 +4,12 @@ import net.minecraft.world.World;
 
 public class ColorfulFX extends ExoFX {
 
-    public ColorfulFX(World worldIn, double posXIn, double posYIn, double posZIn) {
-        super(worldIn, posXIn, posYIn, posZIn);
+    public ColorfulFX(World worldIn, double posXIn, double posYIn, double posZIn, boolean depth) {
+        super(worldIn, posXIn, posYIn, posZIn, depth);
         this.particleMaxAge = 100;
         this.particleGravity = 0.01F;
         this.particleScale = 1;
-        this.particleAlpha = (rand.nextFloat() * 0.5F) + 0.2F;
+        this.particleAlpha = (rand.nextFloat() * 0.75F) + 0.3F;
         this.motionY = 0.05F;
     }
 

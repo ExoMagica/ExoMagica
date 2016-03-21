@@ -27,7 +27,10 @@ public class ItemSpellTest extends Item implements IItemSpell {
     @Override
     public void cast(EntityPlayer player, ItemStack stack) {
         World w = player.getEntityWorld();
-        Minecraft.getMinecraft().effectRenderer.addEffect(new ColorfulFX(w, player.posX + 1, player.posY, player.posZ + 1));
+        if(w.isRemote) {
+            ColorfulFX particle = new ColorfulFX(w, player.posX + 1, player.posY, player.posZ + 1, !player.isSneaking());
+            Minecraft.getMinecraft().effectRenderer.addEffect(particle);
+        }
         //player.addVelocity(0, 1, 0);
     }
 

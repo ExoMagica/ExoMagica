@@ -10,15 +10,17 @@ import org.lwjgl.opengl.GL11;
 
 public class ExoFX extends EntityFX {
 
+    protected boolean depth = true;
     protected float f2, f3, f4, f5, f6;
 
-    public ExoFX(World worldIn, double posXIn, double posYIn, double posZIn) {
+    public ExoFX(World worldIn, double posXIn, double posYIn, double posZIn, boolean depth) {
         super(worldIn, posXIn, posYIn, posZIn);
+        this.depth = depth;
     }
 
     @Override
     public void renderParticle(WorldRenderer worldRenderer, Entity e, float partialTicks, float f2, float f3, float f4, float f5, float f6) {
-        addToQueue(ParticleRenderer.RADIAL_PARTICLES, f2, f3, f4, f5, f6);
+        addToQueue(this.depth ? ParticleRenderer.RADIAL_PARTICLES : ParticleRenderer.RADIAL_NO_DEPTH_PARTICLES, f2, f3, f4, f5, f6);
     }
 
     public void addToQueue(ArrayDeque array, float f2, float f3, float f4, float f5, float f6) {
@@ -61,12 +63,6 @@ public class ExoFX extends EntityFX {
         float f11 = (float)(prevPosX + (posX - prevPosX) * partialTicks - interpPosX);
         float f12 = (float)(prevPosY + (posY - prevPosY) * partialTicks - interpPosY);
         float f13 = (float)(prevPosZ + (posZ - prevPosZ) * partialTicks - interpPosZ);
-
-        /*renderer.color(getRedColorF(), getGreenColorF(), getBlueColorF(), 0.5F);
-        renderer.pos(f11 - f2 * f10 - f5 * f10, f12 - f3 * f10, f13 - f4 * f10 - f6 * f10).tex(0, 1).endVertex();
-        renderer.pos(f11 - f2 * f10 + f5 * f10, f12 + f3 * f10, f13 - f4 * f10 + f6 * f10).tex(1, 1).endVertex();
-        renderer.pos(f11 + f2 * f10 + f5 * f10, f12 + f3 * f10, f13 + f4 * f10 + f6 * f10).tex(1, 0).endVertex();
-        renderer.pos(f11 + f2 * f10 - f5 * f10, f12 - f3 * f10, f13 + f4 * f10 - f6 * f10).tex(0, 0).endVertex();*/
 
         GL11.glColor4f(getRedColorF(partialTicks), getGreenColorF(partialTicks), getBlueColorF(partialTicks), getAlpha(partialTicks));
 

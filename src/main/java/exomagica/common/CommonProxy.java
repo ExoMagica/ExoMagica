@@ -3,6 +3,7 @@ package exomagica.common;
 import exomagica.ExoContent;
 import exomagica.common.handlers.SpellHandler;
 import exomagica.common.items.ItemExoBlock;
+import exomagica.common.tiles.TileAltar;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -19,6 +20,9 @@ public class CommonProxy {
 
     public void registerBlocks() {
         GameRegistry.registerBlock(ExoContent.CHALK, ItemExoBlock.class, "chalk");
+        GameRegistry.registerBlock(ExoContent.ALTAR, "altar");
+
+        GameRegistry.registerTileEntity(TileAltar.class, "TileAltar");
     }
 
     public void registerEntities() {
