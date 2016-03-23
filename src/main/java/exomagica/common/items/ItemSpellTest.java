@@ -6,7 +6,7 @@ import exomagica.api.spells.IItemSpell;
 import exomagica.api.spells.SpellType;
 import exomagica.client.particles.ColorfulFX;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -28,6 +28,7 @@ public class ItemSpellTest extends Item implements IItemSpell {
     public void cast(EntityPlayer player, ItemStack stack) {
         World w = player.getEntityWorld();
         if(w.isRemote) {
+            System.out.println("PARTICLE");
             ColorfulFX particle = new ColorfulFX(w, player.posX + 1, player.posY, player.posZ + 1, !player.isSneaking());
             Minecraft.getMinecraft().effectRenderer.addEffect(particle);
         }
@@ -37,12 +38,6 @@ public class ItemSpellTest extends Item implements IItemSpell {
     @Override
     public SpellType getType() {
         return SpellType.HOLD;
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public ModelResourceLocation getModel(ItemStack stack, EntityPlayer player, int useRemaining) {
-        return MODEL;
     }
 
 }

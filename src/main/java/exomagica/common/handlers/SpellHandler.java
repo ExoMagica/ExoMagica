@@ -11,7 +11,7 @@ public class SpellHandler {
     @SubscribeEvent
     public void interact(PlayerInteractEvent event) {
         if(event.action != Action.LEFT_CLICK_BLOCK) {
-            ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
+            ItemStack stack = event.entityPlayer.getActiveItemStack();
             if(stack == null) {
 
                 // Check for hand spells

@@ -21,16 +21,18 @@ public class ExoMagica {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        LOG.info("Preparing...");
+        LOG.info("Loading ExoMagica components...");
+        LOG.debug("Preparing...");
         PROXY.prepare();
-        LOG.info("Registering Items...");
+        LOG.debug("Registering Items...");
         PROXY.registerItems();
-        LOG.info("Registering Blocks...");
+        LOG.debug("Registering Blocks...");
         PROXY.registerBlocks();
-        LOG.info("Registering Entities...");
+        LOG.debug("Registering Entities...");
         PROXY.registerEntities();
-        LOG.info("Registering Handlers...");
+        LOG.debug("Registering Handlers...");
         PROXY.registerHandlers();
+        LOG.info("ExoMagica components are now loaded.");
     }
 
 }

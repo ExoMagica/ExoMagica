@@ -10,6 +10,9 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * This is based on Vazkii's particle dispatcher
+ */
 public class ParticleRenderer {
 
     public static final ArrayDeque<ExoFX> RADIAL_PARTICLES = new ArrayDeque<ExoFX>();
@@ -18,6 +21,8 @@ public class ParticleRenderer {
 
     @SubscribeEvent
     public void render(RenderWorldLastEvent event) {
+        //if(true) return;
+        GL11.glPushMatrix();
         TextureManager tex = Minecraft.getMinecraft().getTextureManager();
 
         GL11.glPushAttrib(GL11.GL_LIGHTING);
@@ -31,9 +36,12 @@ public class ParticleRenderer {
         renderRadial(tex, event.partialTicks);
 
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
-        GL11.glDisable(GL11.GL_BLEND);
+        //GL11.glDisable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDepthMask(true);
         GL11.glPopAttrib();
+
+        GL11.glPopMatrix();
     }
 
     public void renderRadial(TextureManager tex, float partialTicks) {

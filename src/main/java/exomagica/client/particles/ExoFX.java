@@ -3,7 +3,7 @@ package exomagica.client.particles;
 import exomagica.client.handlers.ParticleRenderer;
 import java.util.ArrayDeque;
 import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 public class ExoFX extends EntityFX {
 
     protected boolean depth = true;
-    protected float f2, f3, f4, f5, f6;
+    protected float rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ;
 
     public ExoFX(World worldIn, double posXIn, double posYIn, double posZIn, boolean depth) {
         super(worldIn, posXIn, posYIn, posZIn);
@@ -19,16 +19,18 @@ public class ExoFX extends EntityFX {
     }
 
     @Override
-    public void renderParticle(WorldRenderer worldRenderer, Entity e, float partialTicks, float f2, float f3, float f4, float f5, float f6) {
-        addToQueue(this.depth ? ParticleRenderer.RADIAL_PARTICLES : ParticleRenderer.RADIAL_NO_DEPTH_PARTICLES, f2, f3, f4, f5, f6);
+    public void renderParticle(VertexBuffer worldRendererIn, Entity entityIn, float partialTicks,
+                               float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+        addToQueue(this.depth ? ParticleRenderer.RADIAL_PARTICLES : ParticleRenderer.RADIAL_NO_DEPTH_PARTICLES,
+                rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
     }
 
-    public void addToQueue(ArrayDeque array, float f2, float f3, float f4, float f5, float f6) {
-        this.f2 = f2;
-        this.f3 = f3;
-        this.f4 = f4;
-        this.f5 = f5;
-        this.f6 = f6;
+    public void addToQueue(ArrayDeque array, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+        this.rotationX = rotationX;
+        this.rotationZ = rotationZ;
+        this.rotationYZ = rotationYZ;
+        this.rotationXY = rotationXY;
+        this.rotationXZ = rotationXZ;
         array.add(this);
     }
 
@@ -46,9 +48,9 @@ public class ExoFX extends EntityFX {
 
     public float getAlpha(float partialTicks) {
         if(particleMaxAge - 100 < particleAge) {
-            return getAlpha() * ((particleMaxAge - particleAge) / 100F);
+            return particleAlpha * ((particleMaxAge - particleAge) / 100F);
         }
-        return getAlpha();
+        return particleAlpha;
     }
 
     public float getScale(float partialTicks) {
@@ -67,12 +69,12 @@ public class ExoFX extends EntityFX {
         GL11.glColor4f(getRedColorF(partialTicks), getGreenColorF(partialTicks), getBlueColorF(partialTicks), getAlpha(partialTicks));
 
         GL11.glTexCoord2f(0, 1);
-        GL11.glVertex3f(f11 - f2 * f10 - f5 * f10, f12 - f3 * f10, f13 - f4 * f10 - f6 * f10);
+        GL11.glVertex3f(f11 - rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 - rotationYZ * f10 - rotationXZ * f10);
         GL11.glTexCoord2f(1, 1);
-        GL11.glVertex3f(f11 - f2 * f10 + f5 * f10, f12 + f3 * f10, f13 - f4 * f10 + f6 * f10);
+        GL11.glVertex3f(f11 - rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 - rotationYZ * f10 + rotationXZ * f10);
         GL11.glTexCoord2f(1, 0);
-        GL11.glVertex3f(f11 + f2 * f10 + f5 * f10, f12 + f3 * f10, f13 + f4 * f10 + f6 * f10);
+        GL11.glVertex3f(f11 + rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 + rotationYZ * f10 + rotationXZ * f10);
         GL11.glTexCoord2f(0, 0);
-        GL11.glVertex3f(f11 + f2 * f10 - f5 * f10, f12 - f3 * f10, f13 + f4 * f10 - f6 * f10);
+        GL11.glVertex3f(f11 + rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 + rotationYZ * f10 - rotationXZ * f10);
     }
 }

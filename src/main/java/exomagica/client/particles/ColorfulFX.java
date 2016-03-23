@@ -10,7 +10,7 @@ public class ColorfulFX extends ExoFX {
         this.particleGravity = 0.01F;
         this.particleScale = 1;
         this.particleAlpha = (rand.nextFloat() * 0.75F) + 0.3F;
-        this.motionY = 0.05F;
+        this.ySpeed = 0.05F;
     }
 
     @Override

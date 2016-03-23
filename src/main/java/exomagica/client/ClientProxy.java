@@ -7,6 +7,7 @@ import exomagica.common.CommonProxy;
 import exomagica.common.tiles.TileAltar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -35,6 +36,9 @@ public class ClientProxy extends CommonProxy {
         super.registerBlocks();
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileAltar.class, new AltarRenderer());
+
+        BlockColors bc = Minecraft.getMinecraft().getBlockColors();
+        bc.registerBlockColorHandler(ExoContent.CHALK, ExoContent.CHALK);
     }
 
     @Override

@@ -5,26 +5,33 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockChalk extends Block {
+public class BlockChalk extends Block implements IBlockColor {
 
     public static final PropertyEnum<ChalkType> TYPE = PropertyEnum.create("type", ChalkType.class);
+
+    private final AxisAlignedBB box;
 
     public BlockChalk() {
         super(Material.circuits);
         this.setRegistryName("chalk");
         this.setUnlocalizedName("chalk");
-        this.setBlockBounds(0F, 0.0F, 0F, 1F, 0.0625F, 1F);
+        box = new AxisAlignedBB(0F, 0.0F, 0F, 1F, 0.0625F, 1F);
         this.setLightOpacity(0);
         this.setHardness(0);
         this.setCreativeTab(ExoContent.TAB);
@@ -38,22 +45,18 @@ public class BlockChalk extends Block {
     }
 
     @Override
-    public boolean isFullCube() {
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
     @Override
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-        return World.doesBlockHaveSolidTopSurface(worldIn, pos.down()) && super.canPlaceBlockAt(worldIn, pos);
-    }
-
-    public boolean canBlockStay(World worldIn, BlockPos pos) {
-        return World.doesBlockHaveSolidTopSurface(worldIn, pos.down());
+        return worldIn.getBlockState(pos.down()).isFullBlock();
     }
 
     @Override
-    protected BlockState createBlockState() {
-        return new BlockState(this, TYPE);
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, TYPE);
     }
 
     @Override
@@ -69,17 +72,17 @@ public class BlockChalk extends Block {
     }
 
     @Override
-    public boolean isOpaqueCube() {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean isTranslucent() {
+    public boolean isTranslucent(IBlockState state) {
         return true;
     }
 
     @Override
-    public boolean isFullBlock() {
+    public boolean isFullBlock(IBlockState state) {
         return false;
     }
 
@@ -88,17 +91,18 @@ public class BlockChalk extends Block {
         return false;
     }
 
-    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
-        return null;
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return box;
     }
 
     @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+    @Override
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         return side.getAxis() != EnumFacing.Axis.Y;
     }
 
     @Override
-    public int getRenderColor(IBlockState state) {
+    public int colorMultiplier(IBlockState state, IBlockAccess p_186720_2_, BlockPos pos, int tintIndex) {
         if(state.getValue(TYPE) == ChalkType.SPECIAL) {
             /*long time = Minecraft.getSystemTime() / 50;
             int r = (int)(Math.sin(0.02 * time + 0) * 127 + 128);
@@ -114,13 +118,8 @@ public class BlockChalk extends Block {
     }
 
     @SideOnly(Side.CLIENT)
-    public int colorMultiplier(IBlockAccess world, BlockPos pos, int renderPass) {
-        return getRenderColor(world.getBlockState(pos));
-    }
-
-    @SideOnly(Side.CLIENT)
-    public EnumWorldBlockLayer getBlockLayer() {
-        return EnumWorldBlockLayer.CUTOUT;
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
     }
 
     enum ChalkType implements IStringSerializable {
