@@ -4,12 +4,14 @@ import exomagica.ExoContent;
 import exomagica.ExoMagica;
 import exomagica.api.spells.IItemSpell;
 import exomagica.api.spells.SpellType;
-import exomagica.client.particles.ColorfulFX;
+import exomagica.client.particles.CubeFX;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,12 +31,18 @@ public class ItemSpellTest extends Item implements IItemSpell {
         World w = player.getEntityWorld();
         if(w.isRemote) {
             System.out.println("PARTICLE");
-            ColorfulFX particle = new ColorfulFX(w, player.posX + 1, player.posY, player.posZ + 1, !player.isSneaking());
+            //ColorfulFX particle = new ColorfulFX(w, player.posX + 1, player.posY, player.posZ + 1, !player.isSneaking());
+            CubeFX particle = new CubeFX(w, player.posX + 1, player.posY, player.posZ + 1);
             Minecraft.getMinecraft().effectRenderer.addEffect(particle);
         }
         //player.addVelocity(0, 1, 0);
     }
 
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+        cast(playerIn, itemStackIn);
+        return super.onItemRightClick(itemStackIn, worldIn, playerIn, hand);
+    }
     @Override
     public SpellType getType() {
         return SpellType.HOLD;

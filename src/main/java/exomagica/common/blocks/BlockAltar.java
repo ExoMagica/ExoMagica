@@ -21,6 +21,8 @@ public class BlockAltar extends Block {
         this.setCreativeTab(ExoContent.TAB);
         this.setUnlocalizedName("altar");
         this.setRegistryName("altar");
+        this.setHardness(1.5F);
+        this.setResistance(10);
     }
 
     @Override
@@ -124,7 +126,9 @@ public class BlockAltar extends Block {
         TileEntity te = world.getTileEntity(pos);
         if(!world.isRemote && te != null && te instanceof TileAltar) {
             ItemStack item = ((TileAltar)te).removeStackFromSlot(0);
-            world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), item));
+            if(item != null) {
+                world.spawnEntityInWorld(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), item));
+            }
         }
         super.breakBlock(world, pos, state);
     }

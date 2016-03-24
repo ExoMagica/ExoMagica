@@ -1,6 +1,5 @@
 package exomagica.client.particles;
 
-import exomagica.client.handlers.ParticleRenderer;
 import java.util.ArrayDeque;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -10,19 +9,18 @@ import org.lwjgl.opengl.GL11;
 
 public class ExoFX extends EntityFX {
 
-    protected boolean depth = true;
+    protected ArrayDeque<ExoFX> array = null;
     protected float rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ;
 
-    public ExoFX(World worldIn, double posXIn, double posYIn, double posZIn, boolean depth) {
-        super(worldIn, posXIn, posYIn, posZIn);
-        this.depth = depth;
+    public ExoFX(World world, double x, double y, double z, ArrayDeque<ExoFX> array) {
+        super(world, x, y, z);
+        this.array = array;
     }
 
     @Override
     public void renderParticle(VertexBuffer worldRendererIn, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        addToQueue(this.depth ? ParticleRenderer.RADIAL_PARTICLES : ParticleRenderer.RADIAL_NO_DEPTH_PARTICLES,
-                rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        addToQueue(this.array, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
     }
 
     public void addToQueue(ArrayDeque array, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {

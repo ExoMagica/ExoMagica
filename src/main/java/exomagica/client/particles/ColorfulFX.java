@@ -1,11 +1,12 @@
 package exomagica.client.particles;
 
+import exomagica.client.handlers.ParticleRenderer;
 import net.minecraft.world.World;
 
 public class ColorfulFX extends ExoFX {
 
-    public ColorfulFX(World worldIn, double posXIn, double posYIn, double posZIn, boolean depth) {
-        super(worldIn, posXIn, posYIn, posZIn, depth);
+    public ColorfulFX(World w, double x, double y, double z, boolean depth) {
+        super(w, x, y, z, depth ? ParticleRenderer.RADIAL_PARTICLES : ParticleRenderer.RADIAL_NO_DEPTH_PARTICLES);
         this.particleMaxAge = 100;
         this.particleGravity = 0.01F;
         this.particleScale = 1;
