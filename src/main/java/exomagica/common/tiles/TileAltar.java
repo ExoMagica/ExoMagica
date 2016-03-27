@@ -1,9 +1,13 @@
 package exomagica.common.tiles;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
 
@@ -56,7 +60,7 @@ public class TileAltar extends TileEntity implements IInventory {
         if(stack == null) return null;
         ItemStack i = stack;
         stack = null;
-        this.markDirty();
+        this.markUpdate();
         return i;
     }
 
@@ -64,7 +68,7 @@ public class TileAltar extends TileEntity implements IInventory {
     public void setInventorySlotContents(int index, ItemStack stack) {
         if(index != 0) return;
         this.stack = stack;
-        this.markDirty();
+        this.markUpdate();
     }
 
     @Override
@@ -128,4 +132,23 @@ public class TileAltar extends TileEntity implements IInventory {
     public ITextComponent getDisplayName() {
         return null;
     }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+        readFromNBT(packet.getNbtCompound());
+    }
+
+    @Override
+    public Packet<?> getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        writeToNBT(nbt);
+        return new SPacketUpdateTileEntity(pos, 0, nbt);
+    }
+
+    private void markUpdate() {
+        IBlockState state = worldObj.getBlockState(pos);
+        worldObj.notifyBlockUpdate(pos, state, state, 2);
+        markDirty();
+    }
+
 }

@@ -3,7 +3,7 @@
     "inventory": {
       "model": "exomagica:altar"
     },
-    "normal": {
+    "base=true": {
       "model": "exomagica:altar"
     }
   }
