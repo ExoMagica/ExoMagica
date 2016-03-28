@@ -122,7 +122,7 @@ public class BlockChalk extends Block implements IBlockColor {
         return BlockRenderLayer.CUTOUT;
     }
 
-    enum ChalkType implements IStringSerializable {
+    public enum ChalkType implements IStringSerializable {
 
         REGULAR("regular"), SPECIAL("special");
 

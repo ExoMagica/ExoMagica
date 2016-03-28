@@ -1,6 +1,7 @@
 package exomagica.common.blocks;
 
 import exomagica.ExoContent;
+import exomagica.api.ritual.IRitualCore;
 import exomagica.common.tiles.TileAltar;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -21,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockAltar extends Block {
+public class BlockAltar extends Block implements IRitualCore {
 
     public static final PropertyBool BASE = PropertyBool.create("base");
 
@@ -194,6 +195,11 @@ public class BlockAltar extends Block {
             world.setBlockState(pos.down(), Blocks.air.getDefaultState());
         }
         super.breakBlock(world, pos, state);
+    }
+
+    @Override
+    public boolean isRitualCore(IBlockAccess world, BlockPos pos, IBlockState state) {
+        return true;
     }
 
 }
