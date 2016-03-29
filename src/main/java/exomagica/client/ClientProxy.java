@@ -5,9 +5,16 @@ import exomagica.client.blocks.AltarRenderer;
 import exomagica.client.handlers.ParticleRenderer;
 import exomagica.common.CommonProxy;
 import exomagica.common.tiles.TileAltar;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -19,16 +26,11 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void prepare() {
         super.prepare();
-        //OBJLoader.instance.addDomain(ExoMagica.MODID.toLowerCase());
     }
 
     @Override
     public void registerItems() {
         super.registerItems();
-
-        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-
-        mesher.register(ExoContent.SCROLL, 0, ExoContent.SCROLL.MODEL);
     }
 
     @Override
@@ -52,4 +54,30 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(new ParticleRenderer());
     }
 
+
+    @Override
+    protected void registerItem(Item item, String id) {
+        super.registerItem(item, id);
+
+        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
+        ModelResourceLocation loc = new ModelResourceLocation(item.getRegistryName(), "inventory");
+        List<ItemStack> items = new ArrayList<ItemStack>();
+        item.getSubItems(item, null, items);
+        for(ItemStack stack : items) {
+            mesher.register(item, stack.getMetadata(), loc);
+        }
+    }
+    @Override
+    protected void registerBlock(Block block, Class<? extends ItemBlock> itemClass, String id) {
+        super.registerBlock(block, itemClass, id);
+
+        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
+        Item item = Item.getItemFromBlock(block);
+        ModelResourceLocation loc = new ModelResourceLocation(block.getRegistryName(), "inventory");
+        List<ItemStack> items = new ArrayList<ItemStack>();
+        block.getSubBlocks(item, null, items);
+        for(ItemStack stack : items) {
+            mesher.register(item, stack.getMetadata(), loc);
+        }
+    }
 }

@@ -18,7 +18,7 @@ public class CubeFX extends ExoFX {
     public CubeFX(World w, double x, double y, double z) {
         super(w, x, y, z, ParticleRenderer.CUBE_PARTICLES);
         this.particleRed = particleGreen = particleBlue = 1;
-        this.particleAlpha = 0.5F;
+        this.particleAlpha = 1;
         //this.ySpeed = 0.2F;
         this.particleMaxAge = 500;
 

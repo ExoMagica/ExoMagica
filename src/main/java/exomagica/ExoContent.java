@@ -12,7 +12,7 @@ public class ExoContent {
     public static final CreativeTabs TAB = new CreativeTabs(ExoMagica.MODID) {
         @Override
         public Item getTabIconItem() {
-            return TEST;
+            return SCROLL;
         }
     };
 

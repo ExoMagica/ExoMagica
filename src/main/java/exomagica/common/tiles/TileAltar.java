@@ -26,7 +26,7 @@ public class TileAltar extends TileEntity implements IInventory {
         super.writeToNBT(compound);
 
         NBTTagCompound item = new NBTTagCompound();
-        if(stack != null) stack.writeToNBT(item);
+        if(stack != null && stack.stackSize > 0) stack.writeToNBT(item);
         compound.setTag("AltarItem", item);
     }
 
@@ -49,9 +49,10 @@ public class TileAltar extends TileEntity implements IInventory {
     @Override
     public ItemStack decrStackSize(int index, int count) {
         if(index != 0) return null;
-        if(stack == null) return null;
-        this.markDirty();
-        return stack.splitStack(count);
+        ItemStack r = stack.splitStack(count);
+        if(stack.stackSize <= 0) stack = null;
+        this.markUpdate();
+        return r;
     }
 
     @Override
@@ -61,12 +62,13 @@ public class TileAltar extends TileEntity implements IInventory {
         ItemStack i = stack;
         stack = null;
         this.markUpdate();
-        return i;
+        return i.stackSize == 0 ? null : i;
     }
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
         if(index != 0) return;
+        if(stack.stackSize == 0) stack = null;
         this.stack = stack;
         this.markUpdate();
     }
@@ -94,7 +96,7 @@ public class TileAltar extends TileEntity implements IInventory {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if(index != 0) return false;
-        if(this.stack != null) return false;
+        if(this.stack != null && this.stack.stackSize > 0) return false;
         return true;
     }
 
