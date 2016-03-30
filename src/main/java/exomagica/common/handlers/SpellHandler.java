@@ -2,29 +2,26 @@ package exomagica.common.handlers;
 
 import exomagica.api.spells.IItemSpell;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.EmptyRightClick;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.ItemRightClick;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class SpellHandler {
 
     @SubscribeEvent
-    public void interact(PlayerInteractEvent event) {
-        if(event.action != Action.LEFT_CLICK_BLOCK) {
-            ItemStack stack = event.entityPlayer.getActiveItemStack();
-            if(stack == null) {
+    public void interact(ItemRightClick event) {
+        ItemStack stack = event.getItemStack();
+        if(stack.getItem() instanceof IItemSpell) {
 
-                // Check for hand spells
+            // Cast item spell
+            ((IItemSpell)stack.getItem()).cast(event.getEntityPlayer(), stack);
 
-            } else if(stack.getItem() instanceof IItemSpell) {
-
-                // Cast item spell
-                ((IItemSpell)stack.getItem()).cast(event.entityPlayer, stack);
-
-            }
         }
     }
 
-
+    @SubscribeEvent
+    public void interact(EmptyRightClick event) {
+        // Cast hand spell
+    }
 
 }

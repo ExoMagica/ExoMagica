@@ -26,6 +26,7 @@ public class ParticleRenderer {
     @SubscribeEvent
     public void render(RenderWorldLastEvent event) {
         TextureManager tex = Minecraft.getMinecraft().getTextureManager();
+        float partialTicks = event.getPartialTicks();
 
         GL11.glPushMatrix();
 
@@ -37,7 +38,7 @@ public class ParticleRenderer {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glDepthFunc(GL11.GL_LESS);
         /* CUBE */
-        renderCube(tex, event.partialTicks);
+        renderCube(tex, partialTicks);
 
         GL11.glDepthMask(false);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
@@ -45,7 +46,7 @@ public class ParticleRenderer {
         GL11.glDisable(GL11.GL_LIGHTING);
 
         /* RADIAL */
-        renderRadial(tex, event.partialTicks);
+        renderRadial(tex, partialTicks);
 
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
