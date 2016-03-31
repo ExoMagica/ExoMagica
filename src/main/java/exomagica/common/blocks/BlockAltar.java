@@ -12,6 +12,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -154,7 +155,8 @@ public class BlockAltar extends Block implements IRitualCore {
             if(hand == EnumHand.MAIN_HAND) {
                 altar.setInventorySlotContents(0, p.inventory.decrStackSize(p.inventory.currentItem, 1));
             } else {
-                altar.setInventorySlotContents(0, p.inventory.decrStackSize(p.inventory.getSlotFor(item), 1));
+                int slot = p.inventory.getSlotFor(item);
+                if(slot != -1) altar.setInventorySlotContents(0, p.inventory.decrStackSize(slot, 1));
             }
         } else {
             // Swap items
@@ -200,6 +202,12 @@ public class BlockAltar extends Block implements IRitualCore {
     @Override
     public boolean isRitualCore(IBlockAccess world, BlockPos pos, IBlockState state) {
         return true;
+    }
+
+    @Override
+    public IInventory getInventory(IBlockAccess world, BlockPos pos, IBlockState state) {
+        TileEntity te = world.getTileEntity(pos);
+        return te != null && te instanceof TileAltar ? (TileAltar)te : null;
     }
 
 }

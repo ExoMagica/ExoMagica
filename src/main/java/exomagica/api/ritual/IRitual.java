@@ -1,5 +1,7 @@
 package exomagica.api.ritual;
 
+import java.util.List;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -15,23 +17,35 @@ public interface IRitual {
     boolean checkPattern(IRitualCore core, IBlockAccess world, BlockPos pos);
 
     /**
-     * Fired when the ritual start to happen
+     * Returns the items of this ritual
+     * @param core The core of the ritual
+     * @param world The world
+     * @param pos The position
+     * @return A list with the items
+     */
+    List<ItemStack> getItems(IRitualCore core, IBlockAccess world, BlockPos pos);
+
+    /**
+     * Fired when the ritual starts to happen
      * @param recipe The recipe
      * @param core The core of the ritual
      * @param world The world
      * @param pos The position
-     * @return The default number of ticks that this ritual will take.
+     * @return A new RitualRecipeContainer.
      */
-    int startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos);
+    RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos);
 
     /**
      * Fired when the ritual finishes
-     * @param recipe The recipe
-     * @param core The core of the ritual
-     * @param world The world
-     * @param pos The position
+     * @param container The recipe container
      * @return Whether this ritual was successfully finished
      */
-    boolean finishRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos);
+    boolean finishRitual(RitualRecipeContainer container);
+
+    /**
+     * Fired every tick while the ritual is running
+     * @param container The recipe container
+     */
+    void tickRitual(RitualRecipeContainer container);
 
 }

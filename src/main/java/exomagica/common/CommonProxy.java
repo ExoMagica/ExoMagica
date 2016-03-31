@@ -1,6 +1,7 @@
 package exomagica.common;
 
 import exomagica.ExoContent;
+import exomagica.common.handlers.RitualHandler;
 import exomagica.common.handlers.SpellHandler;
 import exomagica.common.items.ItemExoBlock;
 import exomagica.common.tiles.TileAltar;
@@ -35,6 +36,7 @@ public class CommonProxy {
 
     public void registerHandlers() {
         MinecraftForge.EVENT_BUS.register(new SpellHandler());
+        MinecraftForge.EVENT_BUS.register(new RitualHandler());
     }
 
 
