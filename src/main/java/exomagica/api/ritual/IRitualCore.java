@@ -17,6 +17,15 @@ public interface IRitualCore {
     boolean isRitualCore(IBlockAccess world, BlockPos pos, IBlockState state);
 
     /**
+     * Used in multiblock cores
+     * @param world The world
+     * @param pos The position
+     * @param state The state
+     * @return The new BlockPos
+     */
+    BlockPos getRitualCorePosition(IBlockAccess world, BlockPos pos, IBlockState state);
+
+    /**
      * Returns a inventory
      * @param world The world
      * @param pos The position

@@ -6,9 +6,15 @@ import net.minecraft.item.ItemStack;
 public interface IRitualRecipe<T extends IRitual> {
 
     /**
+     * The item that is usually in the center of the ritual
+     * @return The ItemStack. Can be null if there is no center or no item is needed in the center
+     */
+    ItemStack getCoreItem(T ritual);
+
+    /**
      * Specify the items required for this recipe
      * @param ritual The ritual
-     * @return A list with the required items for this recipe
+     * @return A list with the required ItemStacks for this recipe
      */
     List<ItemStack> getRequiredItems(T ritual);
 

@@ -4,13 +4,17 @@ import exomagica.ExoContent;
 import exomagica.common.handlers.RitualHandler;
 import exomagica.common.handlers.SpellHandler;
 import exomagica.common.items.ItemExoBlock;
+import exomagica.common.packets.RitualPacket;
+import exomagica.common.packets.RitualPacket.RitualPacketHandler;
 import exomagica.common.tiles.TileAltar;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class CommonProxy {
 
@@ -37,6 +41,10 @@ public class CommonProxy {
     public void registerHandlers() {
         MinecraftForge.EVENT_BUS.register(new SpellHandler());
         MinecraftForge.EVENT_BUS.register(new RitualHandler());
+    }
+
+    public void registerPackets(SimpleNetworkWrapper network) {
+        network.registerMessage(new RitualPacketHandler(), RitualPacket.class, 0, Side.CLIENT);
     }
 
 

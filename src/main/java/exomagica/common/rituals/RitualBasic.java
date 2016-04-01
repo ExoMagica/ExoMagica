@@ -5,16 +5,20 @@ import exomagica.api.ritual.IRitual;
 import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
+import exomagica.client.particles.ColorfulFX;
 import exomagica.common.blocks.BlockChalk;
 import exomagica.common.blocks.BlockChalk.ChalkType;
 import exomagica.common.tiles.TileAltar;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
 import scala.actors.threadpool.Arrays;
 
 // "BASIC"????? Yep, we are not creative enough for these names :D
@@ -30,6 +34,16 @@ public class RitualBasic implements IRitual {
         }
 
         return false;
+    }
+
+    @Override
+    public ItemStack getCoreItem(IRitualCore core, IBlockAccess world, BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+        if(state.getBlock() == ExoContent.ALTAR) {
+            TileAltar altar = (TileAltar)world.getTileEntity(pos);
+            return altar.getStackInSlot(0);
+        }
+        return null;
     }
 
     @Override
@@ -79,34 +93,50 @@ public class RitualBasic implements IRitual {
     }
 
     @Override
-    public RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos) {
+    public RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos, Side side) {
+        System.out.println("START RITUAL: " + side);
         int ticks = recipe.startRecipe(this);
-        return new RitualRecipeContainer(this, recipe, core, world, pos, ticks < 0 ? 50 : ticks);
+        return new RitualRecipeContainer(this, recipe, core, world, pos, ticks < 0 ? 100 : ticks);
     }
 
     @Override
-    public boolean finishRitual(RitualRecipeContainer container) {
+    public boolean finishRitual(RitualRecipeContainer container, Side side) {
+        System.out.println("FINISH RITUAL: " + side);
         return container.recipe.finishRecipe(this);
     }
 
     @Override
-    public void tickRitual(RitualRecipeContainer container) {
-
+    public void tickRitual(RitualRecipeContainer c, Side side) {
+        if(side == Side.CLIENT) {
+            ColorfulFX fx = new ColorfulFX((World)c.world, c.pos.getX() + 0.5, c.pos.getY() + 1.75, c.pos.getZ() + 0.5, true);
+            fx.randomizeSpeed();
+            fx.setMaxAge(c.ticksLeft);
+            fx.multiplyVelocity(c.ticksLeft / 500F);
+            Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+        }
     }
 
     public static class RitualBasicRecipe implements IRitualRecipe<RitualBasic> {
 
         private final List<ItemStack> requiredItems;
+        private final ItemStack coreItem;
         private final ItemStack result;
 
-        public RitualBasicRecipe(ItemStack result, List<ItemStack> requiredItems) {
+        public RitualBasicRecipe(ItemStack result, ItemStack coreItem, List<ItemStack> requiredItems) {
             this.requiredItems = requiredItems;
+            this.coreItem = coreItem;
             this.result = result;
         }
 
-        public RitualBasicRecipe(ItemStack result, ItemStack ... requiredItems) {
+        public RitualBasicRecipe(ItemStack result, ItemStack coreItem, ItemStack ... requiredItems) {
             this.requiredItems = Arrays.asList(requiredItems);
+            this.coreItem = coreItem;
             this.result = result;
+        }
+
+        @Override
+        public ItemStack getCoreItem(RitualBasic ritual) {
+            return coreItem;
         }
 
         @Override

@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,6 +20,8 @@ public class ExoMagica {
     @SidedProxy(clientSide = "exomagica.client.ClientProxy", serverSide = "exomagica.common.CommonProxy")
     private static CommonProxy PROXY;
 
+    public static final SimpleNetworkWrapper NETWORK = new SimpleNetworkWrapper(MODID);
+
     @EventHandler
     public void init(FMLInitializationEvent event) {
         LOG.info("Loading ExoMagica components...");
@@ -32,6 +35,8 @@ public class ExoMagica {
         PROXY.registerEntities();
         LOG.debug("Registering Handlers...");
         PROXY.registerHandlers();
+        LOG.debug("Registering Packets...");
+        PROXY.registerPackets(NETWORK);
         LOG.info("ExoMagica components are now loaded.");
     }
 

@@ -10,6 +10,7 @@ public class RitualRecipeContainer {
     public final IRitualCore core;
     public final IBlockAccess world;
     public final BlockPos pos;
+
     public int ticksLeft;
 
     public RitualRecipeContainer(IRitual ritual, IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos, int ticks) {
@@ -18,6 +19,7 @@ public class RitualRecipeContainer {
         this.core = core;
         this.world = world;
         this.pos = pos;
+
         this.ticksLeft = ticks;
     }
 

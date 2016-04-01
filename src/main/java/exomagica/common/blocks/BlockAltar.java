@@ -205,6 +205,12 @@ public class BlockAltar extends Block implements IRitualCore {
     }
 
     @Override
+    public BlockPos getRitualCorePosition(IBlockAccess world, BlockPos pos, IBlockState state) {
+        if(state.getValue(BASE)) return pos;
+        return pos.down();
+    }
+
+    @Override
     public IInventory getInventory(IBlockAccess world, BlockPos pos, IBlockState state) {
         TileEntity te = world.getTileEntity(pos);
         return te != null && te instanceof TileAltar ? (TileAltar)te : null;

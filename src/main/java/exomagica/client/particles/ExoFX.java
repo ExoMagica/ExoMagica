@@ -58,6 +58,16 @@ public class ExoFX extends EntityFX {
         return particleScale;
     }
 
+    public void setSpeed(double x, double y, double z) {
+        this.xSpeed = x;
+        this.ySpeed = y;
+        this.zSpeed = z;
+    }
+
+    public void randomizeSpeed() {
+        setSpeed((rand.nextGaussian() * 2) - 1, (rand.nextGaussian() * 2) - 1, (rand.nextGaussian() * 2) - 1);
+    }
+
     public void renderExoParticle(float partialTicks) {
         float f10 = 0.5F * getScale(partialTicks);
         float f11 = (float)(prevPosX + (posX - prevPosX) * partialTicks - interpPosX);
