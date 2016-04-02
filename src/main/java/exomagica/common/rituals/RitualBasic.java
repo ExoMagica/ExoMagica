@@ -10,9 +10,13 @@ import exomagica.common.blocks.BlockChalk;
 import exomagica.common.blocks.BlockChalk.ChalkType;
 import exomagica.common.tiles.TileAltar;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -37,28 +41,27 @@ public class RitualBasic implements IRitual {
     }
 
     @Override
-    public ItemStack getCoreItem(IRitualCore core, IBlockAccess world, BlockPos pos) {
+    public Map<String, List<IInventory>> getInventories(IRitualCore core, IBlockAccess world, BlockPos pos) {
+        HashMap<String, List<IInventory>> map = new HashMap<String, List<IInventory>>();
+        List<IInventory> elements = new ArrayList<IInventory>();
+        List<IInventory> coreInvs = new ArrayList<IInventory>();
+
         IBlockState state = world.getBlockState(pos);
         if(state.getBlock() == ExoContent.ALTAR) {
-            TileAltar altar = (TileAltar)world.getTileEntity(pos);
-            return altar.getStackInSlot(0);
+            coreInvs.add((TileAltar)world.getTileEntity(pos));
         }
-        return null;
-    }
-
-    @Override
-    public List<ItemStack> getItems(IRitualCore core, IBlockAccess world, BlockPos pos) {
-        List<ItemStack> items = new ArrayList<ItemStack>();
 
         for(EnumFacing facing : EnumFacing.HORIZONTALS) {
             BlockPos pos2 = pos.offset(facing, 3);
-            IBlockState state = world.getBlockState(pos2);
+            state = world.getBlockState(pos2);
             if(state.getBlock() != ExoContent.ALTAR) continue;
-            TileAltar altar = (TileAltar)world.getTileEntity(pos2);
-            items.add(altar.getStackInSlot(0));
+            elements.add((TileAltar)world.getTileEntity(pos2));
         }
 
-        return items;
+        map.put("core", coreInvs);
+        map.put("element", elements);
+
+        return map;
     }
 
     private boolean checkPattern(ChalkType type, IBlockAccess world, BlockPos pos) {
@@ -93,60 +96,84 @@ public class RitualBasic implements IRitual {
     }
 
     @Override
-    public RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos, Side side) {
-        System.out.println("START RITUAL: " + side);
+    public RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos,
+                                             Map<String, List<IInventory>> inventories, Side side) {
         int ticks = recipe.startRecipe(this);
-        return new RitualRecipeContainer(this, recipe, core, world, pos, ticks < 0 ? 100 : ticks);
+        return new RitualRecipeContainer(this, recipe, core, world, pos, inventories, ticks < 0 ? 100 : ticks);
     }
 
     @Override
-    public boolean finishRitual(RitualRecipeContainer container, Side side) {
-        System.out.println("FINISH RITUAL: " + side);
-        return container.recipe.finishRecipe(this);
+    public boolean finishRitual(RitualRecipeContainer c, Side side) {
+        boolean finish = c.recipe.finishRecipe(this);
+        if(side == Side.CLIENT) {
+            if(finish) {
+                EffectRenderer renderer = Minecraft.getMinecraft().effectRenderer;
+
+                for(int i = 0; i < 25; i++) {
+                    ColorfulFX fx = new ColorfulFX((World)c.world, c.pos.getX() + 0.5, c.pos.getY() + 1.75, c.pos.getZ() + 0.5, true);
+                    fx.randomizeSpeed();
+                    fx.multiplyVelocity(0.1F);
+                    fx.setMaxAge(80);
+                    renderer.addEffect(fx);
+                }
+
+            }
+        }
+        return finish;
     }
 
     @Override
     public void tickRitual(RitualRecipeContainer c, Side side) {
-        if(side == Side.CLIENT) {
-            ColorfulFX fx = new ColorfulFX((World)c.world, c.pos.getX() + 0.5, c.pos.getY() + 1.75, c.pos.getZ() + 0.5, true);
-            fx.randomizeSpeed();
-            fx.setMaxAge(c.ticksLeft);
-            fx.multiplyVelocity(c.ticksLeft / 500F);
-            Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+        if(side == Side.CLIENT && c.ticksLeft > 15 || c.ticksLeft == 5) {
+            EffectRenderer renderer = Minecraft.getMinecraft().effectRenderer;
+            boolean isBig = c.ticksLeft == 5;
+            for(EnumFacing facing : EnumFacing.HORIZONTALS) {
+                BlockPos pos = c.pos.offset(facing, 3);
+
+                ColorfulFX fx = new ColorfulFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, true);
+                fx.multipleParticleScaleBy(isBig ? 3 : 0.5F);
+                fx.setAlphaEffect(false);
+                fx.setScaleEffect(false);
+                fx.enableFinalCoords(c.pos.getX() + 0.5F, c.pos.getY() + 1.75F, c.pos.getZ() + 0.5F, isBig ? 0.25F : 0.1F, 50);
+                fx.setNoClip(true);
+                renderer.addEffect(fx);
+            }
         }
     }
 
     public static class RitualBasicRecipe implements IRitualRecipe<RitualBasic> {
 
-        private final List<ItemStack> requiredItems;
-        private final ItemStack coreItem;
-        private final ItemStack result;
+        private final Map<String, List<Object>> requiredItems;
+        private final Map<String, List<ItemStack>> results;
 
-        public RitualBasicRecipe(ItemStack result, ItemStack coreItem, List<ItemStack> requiredItems) {
-            this.requiredItems = requiredItems;
-            this.coreItem = coreItem;
-            this.result = result;
+        public RitualBasicRecipe(ItemStack result, Object coreItem, List<Object> requiredItems) {
+            this.requiredItems = new HashMap<String, List<Object>>();
+
+            List<Object> coreItems = new ArrayList<Object>();
+            coreItems.add(coreItem);
+
+            this.requiredItems.put("core", coreItems);
+            this.requiredItems.put("element", requiredItems);
+
+            this.results = new HashMap<String, List<ItemStack>>();
+
+            List<ItemStack> coreResults = new ArrayList<ItemStack>();
+            coreResults.add(result);
+            this.results.put("core", coreResults);
         }
 
-        public RitualBasicRecipe(ItemStack result, ItemStack coreItem, ItemStack ... requiredItems) {
-            this.requiredItems = Arrays.asList(requiredItems);
-            this.coreItem = coreItem;
-            this.result = result;
+        public RitualBasicRecipe(ItemStack result, Object coreItem, Object ... requiredItems) {
+            this(result, coreItem, Arrays.asList(requiredItems));
         }
 
         @Override
-        public ItemStack getCoreItem(RitualBasic ritual) {
-            return coreItem;
-        }
-
-        @Override
-        public List<ItemStack> getRequiredItems(RitualBasic ritual) {
+        public Map<String, List<Object>> getRequiredItems(RitualBasic ritual) {
             return requiredItems;
         }
 
         @Override
-        public ItemStack getResult(RitualBasic ritual) {
-            return result;
+        public Map<String, List<ItemStack>> getResults(RitualBasic ritual) {
+            return results;
         }
 
         @Override

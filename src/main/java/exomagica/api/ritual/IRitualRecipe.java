@@ -1,29 +1,24 @@
 package exomagica.api.ritual;
 
 import java.util.List;
+import java.util.Map;
 import net.minecraft.item.ItemStack;
 
 public interface IRitualRecipe<T extends IRitual> {
 
     /**
-     * The item that is usually in the center of the ritual
-     * @return The ItemStack. Can be null if there is no center or no item is needed in the center
+     * Specify the items required for this recipe. The items must be a ItemStack, Item, String, Fluid or FluidStack
+     * @param ritual The ritual
+     * @return A map with the required items for each inventory type
      */
-    ItemStack getCoreItem(T ritual);
+    Map<String, List<Object>> getRequiredItems(T ritual);
 
     /**
-     * Specify the items required for this recipe
+     * Specify the result items of this recipe.
      * @param ritual The ritual
-     * @return A list with the required ItemStacks for this recipe
+     * @return The result for each inventory type
      */
-    List<ItemStack> getRequiredItems(T ritual);
-
-    /**
-     * Specify the result item of this recipe
-     * @param ritual The ritual
-     * @return The result of this recipe
-     */
-    ItemStack getResult(T ritual);
+    Map<String, List<ItemStack>> getResults(T ritual);
 
     /**
      * Fired when the recipe start to happen

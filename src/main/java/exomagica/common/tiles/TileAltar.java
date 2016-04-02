@@ -68,7 +68,7 @@ public class TileAltar extends TileEntity implements IInventory {
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
         if(index != 0) return;
-        if(stack.stackSize == 0) stack = null;
+        if(stack != null && stack.stackSize == 0) stack = null;
         this.stack = stack;
         this.markUpdate();
     }
@@ -96,7 +96,7 @@ public class TileAltar extends TileEntity implements IInventory {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if(index != 0) return false;
-        if(this.stack != null && this.stack.stackSize > 0) return false;
+        //if(this.stack != null && this.stack.stackSize > 0) return false;
         return true;
     }
 

@@ -6,7 +6,10 @@ import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.common.handlers.RitualHandler;
 import io.netty.buffer.ByteBuf;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -48,9 +51,20 @@ public class RitualPacket implements IMessage {
             World world = Minecraft.getMinecraft().theWorld;
 
             IRitualCore core = RitualHandler.getCore(world, message.pos);
+            if(core == null) return null;
+
             IRitual ritual = RitualHandler.findRitual(core, world, message.pos);
-            IRitualRecipe recipe = RitualHandler.findRitualRecipe(ritual, core, world, message.pos);
-            RitualRecipeContainer container = ritual.startRitual(recipe, core, world, message.pos, Side.CLIENT);
+            if(ritual == null) return null;
+
+            Map<String, List<IInventory>> inventories = ritual.getInventories(core, world, message.pos);
+            if(inventories.isEmpty()) return null;
+
+            List<IRitualRecipe> recipes = RitualHandler.RITUALS_RECIPES.get(ritual);
+            IRitualRecipe recipe = RitualHandler.findRitualRecipe(ritual, recipes, inventories);
+            if(recipe == null) return null;
+
+            RitualRecipeContainer container = ritual.startRitual(recipe, core, world, message.pos, inventories, Side.CLIENT);
+            if(container == null) return null;
             RitualHandler.CLIENT_ACTIVE_RITUALS.add(container);
 
             return null;

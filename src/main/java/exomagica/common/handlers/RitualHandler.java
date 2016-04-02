@@ -8,14 +8,16 @@ import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.common.packets.RitualPacket;
-import exomagica.common.rituals.RitualBasic;
-import exomagica.common.rituals.RitualBasic.RitualBasicRecipe;
+import exomagica.common.utils.ItemUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -31,12 +33,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class RitualHandler {
 
-    private final static HashMap<String, IRitual> NAMED_RITUALS = new HashMap<String, IRitual>();
-    private final static HashMap<IRitual, List<IRitualRecipe>> RITUALS_RECIPES = new HashMap<IRitual, List<IRitualRecipe>>();
+    public final static HashMap<String, IRitual> NAMED_RITUALS = new HashMap<String, IRitual>();
+    public final static HashMap<IRitual, List<IRitualRecipe>> RITUALS_RECIPES = new HashMap<IRitual, List<IRitualRecipe>>();
 
     public static void registerRitual(IRitual ritual, String name) {
         if(Strings.isNullOrEmpty(name)) {
@@ -97,26 +98,23 @@ public class RitualHandler {
     @SideOnly(Side.CLIENT)
     public final static List<RitualRecipeContainer> CLIENT_ACTIVE_RITUALS = new ArrayList<RitualRecipeContainer>();
 
-    public RitualHandler() {
-        registerRitual(new RitualBasic(), "basic");
-        registerRecipe("basic", new RitualBasicRecipe(new ItemStack(Items.arrow), new ItemStack(Items.diamond),
-                new ItemStack(Items.lava_bucket), new ItemStack(Items.flint_and_steel),
-                new ItemStack(Blocks.torch), new ItemStack(Items.coal)));
-    }
-
     @SubscribeEvent
     public void tick(ServerTickEvent event) {
         for(int i = 0; i < SERVER_ACTIVE_RITUALS.size(); i++) {
-            RitualRecipeContainer container = SERVER_ACTIVE_RITUALS.get(i);
-            if(container.ticksLeft-- <= 0) {
-                boolean canCraft = container.ritual.finishRitual(container, Side.SERVER);
-                SERVER_ACTIVE_RITUALS.remove(container);
-                if(canCraft) {
-                    // TODO craft
-                    //container.recipe.getResult(container.ritual);
+            RitualRecipeContainer c = SERVER_ACTIVE_RITUALS.get(i);
+            if(c.ticksLeft-- <= 0) {
+                SERVER_ACTIVE_RITUALS.remove(c);
+                if(checkRecipe(c.ritual, c.recipe, c.inventories) &&
+                        c.ritual.checkPattern(c.core, c.world, c.pos)) {
+                    boolean canCraft = c.ritual.finishRitual(c, Side.SERVER);
+                    if(canCraft) craft(c);
                 }
             } else {
-                container.ritual.tickRitual(container, Side.SERVER);
+                if(c.ticksLeft % 20 == 0 && !checkRecipe(c.ritual, c.recipe, c.inventories)) {
+                    SERVER_ACTIVE_RITUALS.remove(c);
+                    continue;
+                }
+                c.ritual.tickRitual(c, Side.SERVER);
             }
         }
     }
@@ -124,12 +122,20 @@ public class RitualHandler {
     @SubscribeEvent
     public void tick(ClientTickEvent event) {
         for(int i = 0; i < CLIENT_ACTIVE_RITUALS.size(); i++) {
-            RitualRecipeContainer container = CLIENT_ACTIVE_RITUALS.get(i);
-            if(container.ticksLeft-- <= 0) {
-                container.ritual.finishRitual(container, Side.CLIENT);
-                CLIENT_ACTIVE_RITUALS.remove(container);
+            RitualRecipeContainer c = CLIENT_ACTIVE_RITUALS.get(i);
+            if(c.ticksLeft-- <= 0) {
+                CLIENT_ACTIVE_RITUALS.remove(c);
+                if(checkRecipe(c.ritual, c.recipe, c.inventories) &&
+                        c.ritual.checkPattern(c.core, c.world, c.pos)) {
+                    boolean canCraft = c.ritual.finishRitual(c, Side.CLIENT);
+                    if(canCraft) craft(c); // Executed in client-side for instant update
+                }
             } else {
-                container.ritual.tickRitual(container, Side.CLIENT);
+                if(c.ticksLeft % 20 == 0 && !checkRecipe(c.ritual, c.recipe, c.inventories)) {
+                    CLIENT_ACTIVE_RITUALS.remove(c);
+                    continue;
+                }
+                c.ritual.tickRitual(c, Side.CLIENT);
             }
         }
     }
@@ -162,16 +168,25 @@ public class RitualHandler {
         event.setCanceled(true);
         event.setUseBlock(Result.DENY);
 
+        for(int i = 0; i < SERVER_ACTIVE_RITUALS.size(); i++) {
+            RitualRecipeContainer c = SERVER_ACTIVE_RITUALS.get(i);
+            if(c != null && c.world == world && c.pos.equals(pos)) return; // There is already a ritual running here
+        }
+
         IRitual ritual = findRitual(core, world, pos);
         if(ritual == null) return;
 
-        IRitualRecipe recipe = findRitualRecipe(ritual, core, world, pos);
+        Map<String, List<IInventory>> inventories = ritual.getInventories(core, world, pos);
+        if(inventories.isEmpty()) return;
+        List<IRitualRecipe> recipes = RITUALS_RECIPES.get(ritual);
+        IRitualRecipe recipe = findRitualRecipe(ritual, recipes, inventories);
         if(recipe == null) return;
 
-        RitualRecipeContainer container = ritual.startRitual(recipe, core, world, pos, Side.SERVER);
+        RitualRecipeContainer container = ritual.startRitual(recipe, core, world, pos, inventories, Side.SERVER);
 
         if(container != null) {
             SERVER_ACTIVE_RITUALS.add(container);
+            // TODO better packet system
             ExoMagica.NETWORK.sendToAllAround(new RitualPacket(pos), new TargetPoint(world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 64));
         }
     }
@@ -208,43 +223,90 @@ public class RitualHandler {
     }
 
     public static IRitualRecipe findRitualRecipe(IRitual ritual, IRitualCore core, IBlockAccess world, BlockPos pos) {
-        List<ItemStack> items = ritual.getItems(core, world, pos);
-        if(items.isEmpty()) return null;
-        ItemStack coreItem = ritual.getCoreItem(core, world, pos);
+        Map<String, List<IInventory>> inventories = ritual.getInventories(core, world, pos);
+        if(inventories.isEmpty()) return null;
         List<IRitualRecipe> recipes = RITUALS_RECIPES.get(ritual);
-        return findRitualRecipe(ritual, recipes, coreItem, items);
+        return findRitualRecipe(ritual, recipes, inventories);
     }
 
-    private static IRitualRecipe findRitualRecipe(IRitual ritual, List<IRitualRecipe> recipes, ItemStack coreItem, List<ItemStack> items) {
-        recipeLoop: for(IRitualRecipe recipe : recipes) {
+    public static IRitualRecipe findRitualRecipe(IRitual ritual, List<IRitualRecipe> recipes, Map<String, List<IInventory>> inventories) {
+        for(IRitualRecipe recipe : recipes) {
 
-            ItemStack recipeCore = recipe.getCoreItem(ritual);
-            if(!OreDictionary.itemMatches(recipeCore, coreItem, false)) continue;
-
-            List<ItemStack> recipeItems = recipe.getRequiredItems(ritual);
-            if(recipeItems.size() > items.size()) continue;
-
-            recipeItems = new ArrayList<ItemStack>(recipeItems);
-            for(ItemStack stack : items) {
-
-                ItemStack recipeItem = null;
-                for(ItemStack ri : recipeItems) {
-                    if(OreDictionary.itemMatches(ri, stack, false)) {
-                        recipeItem = ri;
-                    }
-                }
-                if(recipeItem == null) {
-                    continue recipeLoop;
-                } else {
-                    recipeItems.remove(recipeItem);
-                }
-
+            if(checkRecipe(ritual, recipe, inventories)) {
+                return recipe;
             }
 
-            if(recipeItems.isEmpty()) return recipe;
+        }
+        return null;
+    }
+
+    public static boolean checkRecipe(IRitual ritual, IRitualRecipe recipe, Map<String, List<IInventory>> inventories) {
+        Map<String, List<Object>> requiredItems = recipe.getRequiredItems(ritual);
+
+        for(String type : requiredItems.keySet()) {
+            List<IInventory> invs = inventories.get(type);
+            if(invs == null) invs = Collections.emptyList();
+            List<Object> items = requiredItems.get(type);
+            if(items == null) {
+                items = Collections.emptyList();
+            } else {
+                items = new ArrayList<Object>(items);
+            }
+            if(invs.isEmpty() && !items.isEmpty()) return false;
+
+            for(IInventory inv : invs) {
+                for(int slot = 0; slot < inv.getSizeInventory(); slot++) {
+                    ItemStack slotStack = inv.getStackInSlot(slot);
+
+                    Object match = null;
+                    for(Object stack : items) {
+                        if(ItemUtils.itemMatches(stack, slotStack)) {
+                            match = stack;
+                            break;
+                        }
+                    }
+
+                    if(match != null) items.remove(match);
+
+                }
+            }
+
+            if(!items.isEmpty()) return false;
         }
 
-        return null;
+        return true;
+    }
+
+    public static void craft(RitualRecipeContainer container) {
+        Map<String, List<ItemStack>> results = container.recipe.getResults(container.ritual);
+        Map<String, List<IInventory>> inventories = container.inventories;
+
+        for(String type : inventories.keySet()) {
+            List<IInventory> invs = inventories.get(type);
+            if(invs == null) invs = Collections.emptyList();
+            List<ItemStack> resultItems = results.get(type);
+            if(resultItems == null) {
+                resultItems = Collections.emptyList();
+            } else {
+                resultItems = new ArrayList<ItemStack>(resultItems);
+            }
+            Iterator<ItemStack> stacks = resultItems.iterator();
+
+            ItemStack stack = null;
+
+            invsLoop: for(IInventory inv : invs) {
+                inv.clear();
+                for(int slot = 0; slot < inv.getSizeInventory(); slot++) {
+                    if(!stacks.hasNext() && stack == null) continue invsLoop;
+                    if(stack == null) stack = stacks.next().copy();
+                    if(inv.isItemValidForSlot(slot, stack)) {
+                        inv.setInventorySlotContents(slot, stack);
+                        stacks.remove();
+                    }
+                }
+            }
+
+        }
     }
 
 }

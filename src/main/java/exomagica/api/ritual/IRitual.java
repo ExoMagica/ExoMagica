@@ -1,7 +1,8 @@
 package exomagica.api.ritual;
 
 import java.util.List;
-import net.minecraft.item.ItemStack;
+import java.util.Map;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,22 +19,13 @@ public interface IRitual {
     boolean checkPattern(IRitualCore core, IBlockAccess world, BlockPos pos);
 
     /**
-     * The item that is usually in the center of the ritual
-     * @param core The core of the ritual
-     * @param world The world
-     * @param pos The position
-     * @return The ItemStack. Can be null if there is no center
-     */
-    ItemStack getCoreItem(IRitualCore core, IBlockAccess world, BlockPos pos);
-
-    /**
      * Returns the items of this ritual
      * @param core The core of the ritual
      * @param world The world
      * @param pos The position
-     * @return A list with the items
+     * @return A map of types and inventories
      */
-    List<ItemStack> getItems(IRitualCore core, IBlockAccess world, BlockPos pos);
+    Map<String, List<IInventory>> getInventories(IRitualCore core, IBlockAccess world, BlockPos pos);
 
     /**
      * Fired when the ritual starts to happen
@@ -42,9 +34,11 @@ public interface IRitual {
      * @param world The world
      * @param pos The position
      * @param side The side
+     * @param inventories The inventories of this ritual
      * @return A new RitualRecipeContainer.
      */
-    RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos, Side side);
+    RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos,
+                                      Map<String, List<IInventory>> inventories, Side side);
 
     /**
      * Fired when the ritual finishes
