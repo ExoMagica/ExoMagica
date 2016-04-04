@@ -28,7 +28,6 @@ public class ItemSpellTest extends Item implements IItemSpell {
     public void cast(EntityPlayer player, ItemStack stack) {
         World w = player.getEntityWorld();
         if(w.isRemote) {
-            System.out.println("PARTICLE");
             //ColorfulFX particle = new ColorfulFX(w, player.posX + 1, player.posY, player.posZ + 1, !player.isSneaking());
             CubeFX particle = new CubeFX(w, player.posX + 1, player.posY, player.posZ + 1);
             Minecraft.getMinecraft().effectRenderer.addEffect(particle);
@@ -39,6 +38,10 @@ public class ItemSpellTest extends Item implements IItemSpell {
     @Override
     public SpellType getType() {
         return SpellType.HOLD;
+    }
+    @Override
+    public int getCooldown() {
+        return 20;
     }
 
 }

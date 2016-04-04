@@ -2,6 +2,10 @@ package exomagica.common;
 
 import exomagica.ExoContent;
 import exomagica.api.IExoMagicaAPI;
+import exomagica.common.capabilities.IPlayerData;
+import exomagica.common.capabilities.PlayerData.PlayerDataFactory;
+import exomagica.common.capabilities.PlayerData.PlayerDataStorage;
+import exomagica.common.handlers.CapabilityHandler;
 import exomagica.common.handlers.RitualHandler;
 import exomagica.common.handlers.SpellHandler;
 import exomagica.common.items.ItemExoBlock;
@@ -18,6 +22,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -26,7 +31,7 @@ import net.minecraftforge.fml.relauncher.Side;
 public class CommonProxy {
 
     public void prepare() {
-
+        CapabilityManager.INSTANCE.register(IPlayerData.class, new PlayerDataStorage(), new PlayerDataFactory());
     }
 
     public void registerItems() {
@@ -48,6 +53,7 @@ public class CommonProxy {
     public void registerHandlers() {
         MinecraftForge.EVENT_BUS.register(new SpellHandler());
         MinecraftForge.EVENT_BUS.register(new RitualHandler());
+        MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
     }
 
     public void registerPackets(SimpleNetworkWrapper network) {

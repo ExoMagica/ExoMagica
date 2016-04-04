@@ -150,7 +150,7 @@ public class BlockAltar extends Block implements IRitualCore {
                 }
             }
 
-        } else if(altar.isItemValidForSlot(0, item)) {
+        } else if(altar.getStackInSlot(0) == null) {
             // Add item
             if(hand == EnumHand.MAIN_HAND) {
                 altar.setInventorySlotContents(0, p.inventory.decrStackSize(p.inventory.currentItem, 1));
