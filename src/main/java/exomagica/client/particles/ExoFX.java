@@ -57,10 +57,6 @@ public class ExoFX extends EntityFX {
 
             if(this.particleAge++ >= this.particleMaxAge) this.setExpired();
 
-            //this.xSpeed = (finalX - posX) * xSpeed;
-            //this.ySpeed = (finalY - posY) * ySpeed;
-            //this.zSpeed = (finalZ - posZ) * zSpeed;
-
             this.moveEntity(this.xSpeed, this.ySpeed, this.zSpeed);
             if(posX >= finalX - finalRange && posY >= finalY - finalRange && posZ >= finalZ - finalRange &&
                 posX <= finalX + finalRange && posY <= finalY + finalRange && posZ <= finalZ + finalRange) {
@@ -138,8 +134,7 @@ public class ExoFX extends EntityFX {
         this.xSpeed = (x - posX) * speed;
         this.ySpeed = (y - posY) * speed;
         this.zSpeed = (z - posZ) * speed;
-        this.finalRange = speed * 2;//Math.max(ySpeed, Math.max(xSpeed, zSpeed));
-        //if(this.finalRange < 0.25) this.finalRange = 0.25;
+        this.finalRange = speed * 2;
         this.hasFinalCoords = true;
         this.particleMaxAge = maxAge;
     }

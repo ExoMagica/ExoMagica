@@ -6,6 +6,7 @@ import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.client.particles.ColorfulFX;
+import exomagica.client.particles.RadialFX;
 import exomagica.common.blocks.BlockChalk;
 import exomagica.common.blocks.BlockChalk.ChalkType;
 import exomagica.common.tiles.TileAltar;
@@ -130,7 +131,8 @@ public class RitualBasic implements IRitual {
             for(EnumFacing facing : EnumFacing.HORIZONTALS) {
                 BlockPos pos = c.pos.offset(facing, 3);
 
-                ColorfulFX fx = new ColorfulFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, true);
+                RadialFX fx = new RadialFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, true,
+                        (float)Math.random(), (float)Math.random(), (float)Math.random());
                 fx.multipleParticleScaleBy(isBig ? 3 : 0.5F);
                 fx.setAlphaEffect(false);
                 fx.setScaleEffect(false);

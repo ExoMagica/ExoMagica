@@ -5,6 +5,7 @@ import exomagica.client.particles.ExoFX;
 import java.util.ArrayDeque;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,6 +23,7 @@ public class ParticleRenderer {
     public static final ArrayDeque<ExoFX> RADIAL_NO_DEPTH_PARTICLES = new ArrayDeque<ExoFX>();
 
     public static final ArrayDeque<ExoFX> CUBE_PARTICLES = new ArrayDeque<ExoFX>();
+    public static final ArrayDeque<ExoFX> TEXTURED_CUBE_PARTICLES = new ArrayDeque<ExoFX>();
 
     @SubscribeEvent
     public void render(RenderWorldLastEvent event) {
@@ -85,6 +87,13 @@ public class ParticleRenderer {
         if(!CUBE_PARTICLES.isEmpty()) {
             for(ExoFX particle : CUBE_PARTICLES) particle.renderExoParticle(partialTicks);
             CUBE_PARTICLES.clear();
+        }
+
+        tex.bindTexture(TextureMap.locationBlocksTexture);
+
+        if(!TEXTURED_CUBE_PARTICLES.isEmpty()) {
+            for(ExoFX particle : TEXTURED_CUBE_PARTICLES) particle.renderExoParticle(partialTicks);
+            TEXTURED_CUBE_PARTICLES.clear();
         }
     }
 

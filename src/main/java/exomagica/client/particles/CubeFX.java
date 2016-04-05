@@ -11,15 +11,17 @@ import org.lwjgl.opengl.GL11;
  */
 public class CubeFX extends ExoFX {
 
-    private static final ModelRenderer BOX = new ModelRenderer(new CubeModel()).addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1);
+    protected static final ModelRenderer BOX = new ModelRenderer(new CubeModel(1, 1)).addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1);
 
-    private float rMod, rX, rY, rZ;
+    protected float rMod, rX, rY, rZ;
+    protected ModelRenderer model = BOX;
 
-    public CubeFX(World w, double x, double y, double z) {
+    public CubeFX(World w, double x, double y, double z, float r, float g, float b) {
         super(w, x, y, z, ParticleRenderer.CUBE_PARTICLES);
-        this.particleRed = particleGreen = particleBlue = 1;
+        this.particleRed = r;
+        this.particleGreen = g;
+        this.particleBlue = b;
         this.particleAlpha = 1;
-        //this.ySpeed = 0.2F;
         this.particleMaxAge = 500;
 
         this.rMod = rand.nextInt(100);
@@ -44,12 +46,15 @@ public class CubeFX extends ExoFX {
 
         GL11.glColor4f(getRedColorF(partialTicks), getGreenColorF(partialTicks), getBlueColorF(partialTicks), getAlpha(partialTicks));
 
-        BOX.render(1);
+        model.render(1);
 
         GL11.glPopMatrix();
     }
 
-    static class CubeModel extends ModelBase {
-
+    protected static class CubeModel extends ModelBase {
+        protected CubeModel(int w, int h) {
+            this.textureWidth = w;
+            this.textureHeight = h;
+        }
     }
 }

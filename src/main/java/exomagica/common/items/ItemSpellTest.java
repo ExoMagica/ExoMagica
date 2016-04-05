@@ -4,12 +4,13 @@ import exomagica.ExoContent;
 import exomagica.ExoMagica;
 import exomagica.api.spells.IItemSpell;
 import exomagica.api.spells.SpellType;
-import exomagica.client.particles.CubeFX;
+import exomagica.client.particles.ItemCubeFX;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,7 +30,9 @@ public class ItemSpellTest extends Item implements IItemSpell {
         World w = player.getEntityWorld();
         if(w.isRemote) {
             //ColorfulFX particle = new ColorfulFX(w, player.posX + 1, player.posY, player.posZ + 1, !player.isSneaking());
-            CubeFX particle = new CubeFX(w, player.posX + 1, player.posY, player.posZ + 1);
+            System.out.println("CAST");
+            ItemStack item = player.getHeldItem(EnumHand.OFF_HAND);
+            ItemCubeFX particle = new ItemCubeFX(w, player.posX + 1, player.posY, player.posZ + 1, item);
             Minecraft.getMinecraft().effectRenderer.addEffect(particle);
         }
         //player.addVelocity(0, 1, 0);
@@ -37,11 +40,11 @@ public class ItemSpellTest extends Item implements IItemSpell {
 
     @Override
     public SpellType getType() {
-        return SpellType.HOLD;
+        return SpellType.CLICK;
     }
     @Override
     public int getCooldown() {
-        return 20;
+        return 1;
     }
 
 }
