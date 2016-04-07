@@ -1,6 +1,7 @@
 package exomagica.common;
 
 import exomagica.ExoContent;
+import exomagica.ExoMagica;
 import exomagica.api.IExoMagicaAPI;
 import exomagica.common.capabilities.IPlayerData;
 import exomagica.common.capabilities.PlayerData.PlayerDataFactory;
@@ -21,6 +22,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -40,7 +42,7 @@ public class CommonProxy {
     }
 
     public void registerBlocks() {
-        registerBlock(ExoContent.CHALK, ItemExoBlock.class, "chalk");
+        registerBlock(ExoContent.CHALK, new ItemExoBlock(ExoContent.CHALK), "chalk");
         registerBlock(ExoContent.ALTAR, "altar");
 
         registerTileEntity(TileAltar.class, "TileAltar");
@@ -72,15 +74,17 @@ public class CommonProxy {
 
 
     protected void registerItem(Item item, String id) {
-        GameRegistry.registerItem(item, id);
+        GameRegistry.register(item, new ResourceLocation(ExoMagica.MODID, id));
     }
 
     protected void registerBlock(Block block, String id) {
-        registerBlock(block, ItemExoBlock.class, id);
+        registerBlock(block, new ItemExoBlock(block), id);
     }
 
-    protected void registerBlock(Block block, Class<? extends ItemBlock> itemClass, String id) {
-        GameRegistry.registerBlock(block, itemClass, id);
+    protected void registerBlock(Block block, ItemBlock itemBlock, String id) {
+        ResourceLocation r = new ResourceLocation(ExoMagica.MODID, id);
+        GameRegistry.register(block, r);
+        GameRegistry.register(itemBlock, r);
     }
 
     protected void registerTileEntity(Class<? extends TileEntity> tileClass, String id) {

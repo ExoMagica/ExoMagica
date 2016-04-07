@@ -68,8 +68,8 @@ public class ClientProxy extends CommonProxy {
         }
     }
     @Override
-    protected void registerBlock(Block block, Class<? extends ItemBlock> itemClass, String id) {
-        super.registerBlock(block, itemClass, id);
+    protected void registerBlock(Block block, ItemBlock itemBlock, String id) {
+        super.registerBlock(block, itemBlock, id);
 
         ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
         Item item = Item.getItemFromBlock(block);

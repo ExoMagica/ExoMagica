@@ -34,7 +34,6 @@ public class BlockAltar extends Block implements IRitualCore {
         super(Material.rock);
         this.setCreativeTab(ExoContent.TAB);
         this.setUnlocalizedName("altar");
-        this.setRegistryName("altar");
         this.setHardness(1.5F);
         this.setResistance(10);
     }

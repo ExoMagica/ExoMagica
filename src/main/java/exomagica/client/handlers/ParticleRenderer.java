@@ -23,7 +23,7 @@ public class ParticleRenderer {
     public static final ArrayDeque<ExoFX> RADIAL_NO_DEPTH_PARTICLES = new ArrayDeque<ExoFX>();
 
     public static final ArrayDeque<ExoFX> CUBE_PARTICLES = new ArrayDeque<ExoFX>();
-    public static final ArrayDeque<ExoFX> TEXTURED_CUBE_PARTICLES = new ArrayDeque<ExoFX>();
+    public static final ArrayDeque<ExoFX> ITEM_CUBE_PARTICLES = new ArrayDeque<ExoFX>();
 
     @SubscribeEvent
     public void render(RenderWorldLastEvent event) {
@@ -91,9 +91,9 @@ public class ParticleRenderer {
 
         tex.bindTexture(TextureMap.locationBlocksTexture);
 
-        if(!TEXTURED_CUBE_PARTICLES.isEmpty()) {
-            for(ExoFX particle : TEXTURED_CUBE_PARTICLES) particle.renderExoParticle(partialTicks);
-            TEXTURED_CUBE_PARTICLES.clear();
+        if(!ITEM_CUBE_PARTICLES.isEmpty()) {
+            for(ExoFX particle : ITEM_CUBE_PARTICLES) particle.renderExoParticle(partialTicks);
+            ITEM_CUBE_PARTICLES.clear();
         }
     }
 

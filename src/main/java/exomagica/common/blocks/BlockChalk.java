@@ -29,7 +29,6 @@ public class BlockChalk extends Block implements IBlockColor {
 
     public BlockChalk() {
         super(Material.circuits);
-        this.setRegistryName("chalk");
         this.setUnlocalizedName("chalk");
         box = new AxisAlignedBB(0F, 0.0F, 0F, 1F, 0.0625F, 1F);
         this.setLightOpacity(0);

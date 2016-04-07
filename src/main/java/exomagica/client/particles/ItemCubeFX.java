@@ -25,7 +25,7 @@ public class ItemCubeFX extends CubeFX {
 
         this.manager = mc.getTextureManager();
 
-        this.array = ParticleRenderer.TEXTURED_CUBE_PARTICLES;
+        this.array = ParticleRenderer.ITEM_CUBE_PARTICLES;
 
         int minU = (int)(particleTexture.getMinU() * TEX_W);
         int minV = (int)(particleTexture.getMinV() * TEX_H);
