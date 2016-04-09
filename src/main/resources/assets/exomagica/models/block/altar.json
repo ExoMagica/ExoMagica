@@ -797,7 +797,7 @@
     "ground": {
         "rotation": [ 0, 0, 0 ],
         "translation": [ 0, 5, 0 ],
-        "scale": [ 1, 1, 1 ]
+        "scale": [ 0.5, 0.5, 0.5 ]
     },
     "fixed": {
         "rotation": [ 0, 0, 0 ],

@@ -27,18 +27,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import scala.actors.threadpool.Arrays;
 
 // "BASIC"????? Yep, we are not creative enough for these names :D
+// WHY DON'T YOU SUGGEST SOME?
 // TODO check if we will keep this name
 public class RitualBasic implements IRitual {
 
     @Override
     public boolean checkPattern(IRitualCore core, IBlockAccess world, BlockPos pos) {
-        if(core != ExoContent.ALTAR) return false;
-
-        if(checkPattern(ChalkType.REGULAR, world, pos)) {
-            return true;
-        }
-
-        return false;
+        return core == ExoContent.ALTAR && checkPattern(ChalkType.REGULAR, world, pos);
     }
 
     @Override
@@ -91,9 +86,7 @@ public class RitualBasic implements IRitual {
     }
 
     private boolean checkChalk(ChalkType type, IBlockState state) {
-        if(state.getBlock() != ExoContent.CHALK) return false;
-        if(state.getValue(BlockChalk.TYPE) != type) return false;
-        return true;
+        return state.getBlock() == ExoContent.CHALK && state.getValue(BlockChalk.TYPE) == type;
     }
 
     @Override
