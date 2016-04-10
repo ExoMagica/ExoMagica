@@ -21,11 +21,11 @@ public interface IRitualRecipe<T extends IRitual> {
     Map<String, List<ItemStack>> getResults(T ritual);
 
     /**
-     * Fired when the recipe start to happen
+     * Returns the duration of this recipe
      * @param ritual The ritual
-     * @return The number of ticks that this recipe will take. Return -1 to use the default value for this ritual
+     * @return The number of ticks. Return -1 to use the default value for this ritual
      */
-    int startRecipe(T ritual);
+    int getDuration(T ritual);
 
     /**
      * Fired when the recipe finishes
@@ -33,5 +33,11 @@ public interface IRitualRecipe<T extends IRitual> {
      * @return Whether this recipe was successfully finished
      */
     boolean finishRecipe(T ritual);
+
+    /**
+     * Fired when the recipe is cancelled
+     * @param ritual The ritual
+     */
+    void cancelRecipe(T ritual);
 
 }

@@ -182,7 +182,10 @@ public class RitualHandler {
         IRitualRecipe recipe = findRitualRecipe(ritual, recipes, inventories);
         if(recipe == null) return;
 
-        RitualRecipeContainer container = ritual.startRitual(recipe, core, world, pos, inventories, Side.SERVER);
+        int ticks = recipe.getDuration(ritual);
+        if(ticks == -1) ticks = ritual.getDuration(recipe, core, world, pos);
+
+        RitualRecipeContainer container = ritual.createContainer(recipe, core, world, pos, ticks, inventories, Side.SERVER);
 
         if(container != null) {
             SERVER_ACTIVE_RITUALS.add(container);

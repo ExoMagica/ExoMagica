@@ -3,15 +3,17 @@ package exomagica.common.tiles;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.ITextComponent;
 
-public class TileAltar extends TileEntity implements IInventory {
+public class TileAltar extends TileEntity implements ISidedInventory {
 
     private ItemStack stack;
 
@@ -96,7 +98,6 @@ public class TileAltar extends TileEntity implements IInventory {
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
         if(index != 0) return false;
-        //if(this.stack != null && this.stack.stackSize > 0) return false;
         return true;
     }
 
@@ -106,9 +107,7 @@ public class TileAltar extends TileEntity implements IInventory {
     }
 
     @Override
-    public void setField(int id, int value) {
-
-    }
+    public void setField(int id, int value) {}
 
     @Override
     public int getFieldCount() {
@@ -153,4 +152,21 @@ public class TileAltar extends TileEntity implements IInventory {
         markDirty();
     }
 
+    @Override
+    public int[] getSlotsForFace(EnumFacing side) {
+        if(side == EnumFacing.DOWN) {
+            return new int[]{0};
+        }
+        return new int[0];
+    }
+
+    @Override
+    public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
+        return direction == EnumFacing.DOWN;
+    }
+
+    @Override
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+        return direction == EnumFacing.DOWN;
+    }
 }

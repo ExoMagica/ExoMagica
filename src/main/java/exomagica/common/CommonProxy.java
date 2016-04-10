@@ -6,6 +6,7 @@ import exomagica.api.IExoMagicaAPI;
 import exomagica.common.capabilities.IPlayerData;
 import exomagica.common.capabilities.PlayerData.PlayerDataFactory;
 import exomagica.common.capabilities.PlayerData.PlayerDataStorage;
+import exomagica.common.entities.EntityRitual;
 import exomagica.common.handlers.CapabilityHandler;
 import exomagica.common.handlers.RitualHandler;
 import exomagica.common.handlers.SpellHandler;
@@ -27,8 +28,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import scala.reflect.api.Internals;
 
 public class CommonProxy {
 
@@ -49,7 +52,7 @@ public class CommonProxy {
     }
 
     public void registerEntities() {
-
+        EntityRegistry.registerModEntity(EntityRitual.class, "ritual", 0, ExoMagica.MODID, 48, 1, false);
     }
 
     public void registerHandlers() {

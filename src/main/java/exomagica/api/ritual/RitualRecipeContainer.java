@@ -3,6 +3,7 @@ package exomagica.api.ritual;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -29,6 +30,14 @@ public class RitualRecipeContainer {
         this.inventories = inventories;
 
         this.ticksLeft = ticks;
+    }
+
+    public void writeToNBT(NBTTagCompound nbt) {
+
+    }
+
+    public void readFromNBT(NBTTagCompound nbt) {
+
     }
 
 }

@@ -28,17 +28,28 @@ public interface IRitual {
     Map<String, List<IInventory>> getInventories(IRitualCore core, IBlockAccess world, BlockPos pos);
 
     /**
+     * Returns the duration of this ritual
+     * @param recipe The recipe
+     * @param core The core
+     * @param world The world
+     * @param pos The position
+     * @return The number of ticks that this ritual will take
+     */
+    int getDuration(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos);
+
+    /**
      * Fired when the ritual starts to happen
      * @param recipe The recipe
      * @param core The core of the ritual
      * @param world The world
      * @param pos The position
-     * @param side The side
+     * @param ticksLeft The remaining ticks
      * @param inventories The inventories of this ritual
+     * @param side The side
      * @return A new RitualRecipeContainer.
      */
-    RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos,
-                                      Map<String, List<IInventory>> inventories, Side side);
+    RitualRecipeContainer createContainer(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos,
+                                          int ticksLeft, Map<String, List<IInventory>> inventories, Side side);
 
     /**
      * Fired when the ritual finishes
@@ -47,6 +58,13 @@ public interface IRitual {
      * @return Whether this ritual was successfully finished
      */
     boolean finishRitual(RitualRecipeContainer container, Side side);
+
+    /**
+     * Fired when the ritual is cancelled
+     * @param container The recipe container
+     * @param side The side
+     */
+    void cancelRitual(RitualRecipeContainer container, Side side);
 
     /**
      * Fired every tick while the ritual is running

@@ -21,6 +21,12 @@ import net.minecraftforge.fml.relauncher.Side;
  * @author Guilherme Chaguri
  */
 public class RitualPacket implements IMessage {
+    /**
+     * 0: Started
+     * 1: Cancelled
+     * 2: Finished (Success)
+     */
+    public byte type = 0;
     public BlockPos pos;
 
     public RitualPacket() {
@@ -63,7 +69,10 @@ public class RitualPacket implements IMessage {
             IRitualRecipe recipe = RitualHandler.findRitualRecipe(ritual, recipes, inventories);
             if(recipe == null) return null;
 
-            RitualRecipeContainer container = ritual.startRitual(recipe, core, world, message.pos, inventories, Side.CLIENT);
+            int ticks = recipe.getDuration(ritual);
+            if(ticks == -1) ticks = ritual.getDuration(recipe, core, world, message.pos);
+
+            RitualRecipeContainer container = ritual.createContainer(recipe, core, world, message.pos, ticks, inventories, Side.CLIENT);
             if(container == null) return null;
             RitualHandler.CLIENT_ACTIVE_RITUALS.add(container);
 

@@ -6,6 +6,8 @@ import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.client.particles.ColorfulFX;
+import exomagica.client.particles.CubeFX;
+import exomagica.client.particles.ItemCubeFX;
 import exomagica.client.particles.RadialFX;
 import exomagica.common.blocks.BlockChalk;
 import exomagica.common.blocks.BlockChalk.ChalkType;
@@ -90,10 +92,14 @@ public class RitualBasic implements IRitual {
     }
 
     @Override
-    public RitualRecipeContainer startRitual(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos,
-                                             Map<String, List<IInventory>> inventories, Side side) {
-        int ticks = recipe.startRecipe(this);
-        return new RitualRecipeContainer(this, recipe, core, world, pos, inventories, ticks < 0 ? 100 : ticks);
+    public int getDuration(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos) {
+        return 500;
+    }
+
+    @Override
+    public RitualRecipeContainer createContainer(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos,
+                                             int ticksLeft, Map<String, List<IInventory>> inventories, Side side) {
+        return new RitualRecipeContainer(this, recipe, core, world, pos, inventories, ticksLeft);
     }
 
     @Override
@@ -124,16 +130,23 @@ public class RitualBasic implements IRitual {
             for(EnumFacing facing : EnumFacing.HORIZONTALS) {
                 BlockPos pos = c.pos.offset(facing, 3);
 
-                RadialFX fx = new RadialFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, true,
-                        (float)Math.random(), (float)Math.random(), (float)Math.random());
+                /*RadialFX fx = new RadialFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, true,
+                        (float)Math.random(), (float)Math.random(), (float)Math.random());*/
+                TileAltar altar = (TileAltar)c.world.getTileEntity(pos);
+                ItemCubeFX fx = new ItemCubeFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, altar.getStackInSlot(0));
                 fx.multipleParticleScaleBy(isBig ? 3 : 0.5F);
                 fx.setAlphaEffect(false);
                 fx.setScaleEffect(false);
-                fx.enableFinalCoords(c.pos.getX() + 0.5F, c.pos.getY() + 1.75F, c.pos.getZ() + 0.5F, isBig ? 0.25F : 0.1F, 50);
+                fx.enableFinalCoords(c.pos.getX() + 0.5F, c.pos.getY() + 1.75F, c.pos.getZ() + 0.5F, isBig ? 0.25F : 0.01F, 500);
                 fx.setNoClip(true);
                 renderer.addEffect(fx);
             }
         }
+    }
+
+    @Override
+    public void cancelRitual(RitualRecipeContainer container, Side side) {
+
     }
 
     public static class RitualBasicRecipe implements IRitualRecipe<RitualBasic> {
@@ -172,13 +185,18 @@ public class RitualBasic implements IRitual {
         }
 
         @Override
-        public int startRecipe(RitualBasic ritual) {
+        public int getDuration(RitualBasic ritual) {
             return -1;
         }
 
         @Override
         public boolean finishRecipe(RitualBasic ritual) {
             return true;
+        }
+
+        @Override
+        public void cancelRecipe(RitualBasic ritual) {
+
         }
 
     }
