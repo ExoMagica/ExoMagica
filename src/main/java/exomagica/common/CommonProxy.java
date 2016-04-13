@@ -11,8 +11,6 @@ import exomagica.common.handlers.CapabilityHandler;
 import exomagica.common.handlers.RitualHandler;
 import exomagica.common.handlers.SpellHandler;
 import exomagica.common.items.ItemExoBlock;
-import exomagica.common.packets.RitualPacket;
-import exomagica.common.packets.RitualPacket.RitualPacketHandler;
 import exomagica.common.rituals.RitualBasic;
 import exomagica.common.rituals.RitualBasic.RitualBasicRecipe;
 import exomagica.common.tiles.TileAltar;
@@ -30,8 +28,6 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import scala.reflect.api.Internals;
 
 public class CommonProxy {
 
@@ -62,7 +58,7 @@ public class CommonProxy {
     }
 
     public void registerPackets(SimpleNetworkWrapper network) {
-        network.registerMessage(new RitualPacketHandler(), RitualPacket.class, 0, Side.CLIENT);
+
     }
 
     public void registerRituals(IExoMagicaAPI api) {

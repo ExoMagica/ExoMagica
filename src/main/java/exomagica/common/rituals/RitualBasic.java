@@ -6,16 +6,10 @@ import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.client.particles.ColorfulFX;
-import exomagica.client.particles.CubeFX;
 import exomagica.client.particles.ItemCubeFX;
-import exomagica.client.particles.RadialFX;
 import exomagica.common.blocks.BlockChalk;
 import exomagica.common.blocks.BlockChalk.ChalkType;
 import exomagica.common.tiles.TileAltar;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
@@ -27,6 +21,11 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import scala.actors.threadpool.Arrays;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // "BASIC"????? Yep, we are not creative enough for these names :D
 // WHY DON'T YOU SUGGEST SOME?
@@ -93,7 +92,7 @@ public class RitualBasic implements IRitual {
 
     @Override
     public int getDuration(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos) {
-        return 500;
+        return 250;
     }
 
     @Override
@@ -130,11 +129,11 @@ public class RitualBasic implements IRitual {
             for(EnumFacing facing : EnumFacing.HORIZONTALS) {
                 BlockPos pos = c.pos.offset(facing, 3);
 
-                /*RadialFX fx = new RadialFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, true,
-                        (float)Math.random(), (float)Math.random(), (float)Math.random());*/
                 TileAltar altar = (TileAltar)c.world.getTileEntity(pos);
-                ItemCubeFX fx = new ItemCubeFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, altar.getStackInSlot(0));
-                fx.multipleParticleScaleBy(isBig ? 3 : 0.5F);
+                ItemStack stack = altar.getStackInSlot(0);
+                if(stack == null) continue;
+                ItemCubeFX fx = new ItemCubeFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, stack);
+                fx.multipleParticleScaleBy((float)(0.5 * Math.random()) + (isBig ? 2.5F : 0.1F));
                 fx.setAlphaEffect(false);
                 fx.setScaleEffect(false);
                 fx.enableFinalCoords(c.pos.getX() + 0.5F, c.pos.getY() + 1.75F, c.pos.getZ() + 0.5F, isBig ? 0.25F : 0.01F, 500);
@@ -172,6 +171,11 @@ public class RitualBasic implements IRitual {
 
         public RitualBasicRecipe(ItemStack result, Object coreItem, Object ... requiredItems) {
             this(result, coreItem, Arrays.asList(requiredItems));
+        }
+
+        @Override
+        public String getIdentifier(RitualBasic ritual) {
+            return null;
         }
 
         @Override

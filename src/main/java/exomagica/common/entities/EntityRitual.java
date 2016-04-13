@@ -1,13 +1,14 @@
 package exomagica.common.entities;
 
-import com.sun.org.apache.regexp.internal.RE;
 import exomagica.api.ritual.IRitual;
+import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.common.handlers.RitualHandler;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -17,10 +18,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.util.List;
+import java.util.Map;
+
 public class EntityRitual extends Entity {
 
-    public static final DataParameter<BlockPos> CORE = EntityDataManager.createKey(EntityRitual.class, DataSerializers.BLOCK_POS);
-    public static final DataParameter<String> RITUAL = EntityDataManager.createKey(EntityRitual.class, DataSerializers.STRING);
+    public static final DataParameter<BlockPos> RITUAL = EntityDataManager.createKey(EntityRitual.class, DataSerializers.BLOCK_POS);
     public static final DataParameter<String> RECIPE = EntityDataManager.createKey(EntityRitual.class, DataSerializers.STRING);
     public static final DataParameter<Integer> TICKS = EntityDataManager.createKey(EntityRitual.class, DataSerializers.VARINT);
     public static final DataParameter<Boolean> CANCELLED = EntityDataManager.createKey(EntityRitual.class, DataSerializers.BOOLEAN);
@@ -28,14 +31,27 @@ public class EntityRitual extends Entity {
     private RitualRecipeContainer container;
     private boolean cancelled = false;
 
+    public EntityRitual(World world) {
+        super(world);
+        this.container = null;
+        this.dataWatcher.register(RITUAL, null);
+        this.dataWatcher.register(RECIPE, null);
+        this.dataWatcher.register(TICKS, 0);
+        this.dataWatcher.register(CANCELLED, false);
+        this.width = 0;
+        this.height = 0;
+    }
+
     public EntityRitual(World world, RitualRecipeContainer container) {
         super(world);
         this.container = container;
-        this.dataWatcher.register(CORE, container.pos);
-        this.dataWatcher.register(RITUAL, null); // TODO
-        this.dataWatcher.register(RECIPE, null);
+        this.dataWatcher.register(RITUAL, container.pos);
+        this.dataWatcher.register(RECIPE, RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
         this.dataWatcher.register(TICKS, container.ticksLeft);
         this.dataWatcher.register(CANCELLED, false);
+        this.width = 0;
+        this.height = 0;
+        this.setPosition(container.pos.getX(), container.pos.getY(), container.pos.getZ());
     }
 
     @Override
@@ -101,17 +117,26 @@ public class EntityRitual extends Entity {
         }
 
         container.ritual.tickRitual(container, side);
+
+        boolean wasDirty = dataWatcher.isDirty();
         this.dataWatcher.set(TICKS, container.ticksLeft);
-        this.dataWatcher.setClean();
+        // Prevent the server from sending a metadata packet each regular tick
+        if(!wasDirty) this.dataWatcher.setClean();
     }
 
     @Override
     public void notifyDataManagerChange(DataParameter<?> key) {
         super.notifyDataManagerChange(key);
-        if(key == TICKS) {
-            container.ticksLeft = dataWatcher.get(TICKS).intValue();
-        } else if(key == CANCELLED) {
+        if(key == CANCELLED) {
             cancelled = dataWatcher.get(CANCELLED).booleanValue();
+        } else if(container == null) {
+
+            if(dataWatcher.get(RITUAL) != null && dataWatcher.get(RECIPE) != null) {
+                loadFromData(dataWatcher.get(RITUAL), dataWatcher.get(RECIPE), dataWatcher.get(TICKS), true);
+            }
+
+        } else if(key == TICKS) {
+            container.ticksLeft = dataWatcher.get(TICKS).intValue();
         }
     }
 
@@ -120,21 +145,51 @@ public class EntityRitual extends Entity {
 
     }
 
+    protected void loadFromData(BlockPos pos, String recipeId, int ticksLeft, boolean setDW) {
+        isDead = true;
+
+        IRitualCore core = RitualHandler.getCore(worldObj, pos);
+
+        if(core == null) return;
+
+        IRitual ritual = RitualHandler.findRitual(core, worldObj, pos);
+
+        if(ritual == null) return;
+
+        IRitualRecipe recipe = RitualHandler.findRitualRecipe(ritual, recipeId);
+
+        if(recipe == null) return;
+
+        Map<String, List<IInventory>> inventories = ritual.getInventories(core, worldObj, pos);
+        Side side = worldObj.isRemote ? Side.CLIENT : Side.SERVER;
+
+        container = ritual.createContainer(recipe, core, worldObj, pos, ticksLeft, inventories, side);
+
+        if(setDW) {
+            this.dataWatcher.set(RITUAL, container.pos);
+            this.dataWatcher.set(RECIPE, RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
+            this.dataWatcher.set(TICKS, container.ticksLeft);
+            this.dataWatcher.set(CANCELLED, false);
+        }
+
+        isDead = false; // If everything was loaded correctly, keep it spawned
+    }
+
     @Override
     protected void readEntityFromNBT(NBTTagCompound nbt) {
-        BlockPos pos = new BlockPos(nbt.getInteger("PosX"), nbt.getInteger("PosY"), nbt.getInteger("PosZ"));
-        IRitual ritual = RitualHandler.findRitual(this.worldObj, pos);
-        //TODO
-        if(ritual != null) {
-            //container = ritual.createContainer();
-            container.readFromNBT(nbt);
-        }
-        cancelled = nbt.getBoolean("Cancelled");
+        BlockPos pos = new BlockPos(nbt.getInteger("RitualX"), nbt.getInteger("RitualY"), nbt.getInteger("RitualZ"));
+        loadFromData(pos, nbt.getString("Recipe"), nbt.getInteger("TicksLeft"), true);
+
+        this.setPosition(container.pos.getX(), container.pos.getY(), container.pos.getZ());
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound nbt) {
         container.writeToNBT(nbt);
-        //nbt.setString("Ritual", RitualHandler.getRitual()container.ritual);
+        nbt.setInteger("RitualX", container.pos.getX());
+        nbt.setInteger("RitualY", container.pos.getY());
+        nbt.setInteger("RitualZ", container.pos.getZ());
+        nbt.setInteger("TicksLeft", container.ticksLeft);
+        nbt.setString("Recipe", RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
     }
 }

@@ -7,6 +7,13 @@ import net.minecraft.item.ItemStack;
 public interface IRitualRecipe<T extends IRitual> {
 
     /**
+     * Returns the unique identifier for this ritual.
+     * @param ritual The ritual
+     * @return The identifier or NULL to use the generated identifier.
+     */
+    String getIdentifier(T ritual);
+
+    /**
      * Specify the items required for this recipe. The items must be a ItemStack, Item, String, Fluid or FluidStack
      * @param ritual The ritual
      * @return A map with the required items for each inventory type

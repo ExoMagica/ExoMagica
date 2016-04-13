@@ -1,20 +1,15 @@
 package exomagica.common.handlers;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import exomagica.ExoMagica;
+import com.google.common.collect.HashBiMap;
 import exomagica.api.IWand;
 import exomagica.api.ritual.IRitual;
 import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
-import exomagica.common.packets.RitualPacket;
+import exomagica.common.entities.EntityRitual;
 import exomagica.common.utils.ItemUtils;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -30,14 +25,15 @@ import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.*;
+
 public class RitualHandler {
 
-    public final static HashMap<String, IRitual> NAMED_RITUALS = new HashMap<String, IRitual>();
-    public final static HashMap<IRitual, List<IRitualRecipe>> RITUALS_RECIPES = new HashMap<IRitual, List<IRitualRecipe>>();
+    public final static HashBiMap<String, IRitual> NAMED_RITUALS = HashBiMap.create();
+    public final static HashMap<IRitual, HashBiMap<String, IRitualRecipe>> RITUALS_RECIPES = new HashMap<IRitual, HashBiMap<String, IRitualRecipe>>();
 
     public static void registerRitual(IRitual ritual, String name) {
         if(Strings.isNullOrEmpty(name)) {
@@ -53,8 +49,9 @@ public class RitualHandler {
         } else {
             name = mod.getModId() + ":" + name;
         }
+        HashBiMap<String, IRitualRecipe> recipes = HashBiMap.create();
         NAMED_RITUALS.put(name, ritual);
-        RITUALS_RECIPES.put(ritual, new ArrayList<IRitualRecipe>());
+        RITUALS_RECIPES.put(ritual, recipes);
     }
 
     public static void registerRecipe(IRitual ritual, IRitualRecipe recipe) {
@@ -68,7 +65,7 @@ public class RitualHandler {
             throw new IllegalArgumentException("The ritual is not registered");
         }
 
-        RITUALS_RECIPES.get(ritual).add(recipe);
+        RITUALS_RECIPES.get(ritual).put(genRitualRecipeName(ritual, recipe), recipe);
     }
 
     public static void registerRecipe(String ritualName, IRitualRecipe recipe) {
@@ -178,8 +175,8 @@ public class RitualHandler {
 
         Map<String, List<IInventory>> inventories = ritual.getInventories(core, world, pos);
         if(inventories.isEmpty()) return;
-        List<IRitualRecipe> recipes = RITUALS_RECIPES.get(ritual);
-        IRitualRecipe recipe = findRitualRecipe(ritual, recipes, inventories);
+        HashBiMap<String, IRitualRecipe> recipes = RITUALS_RECIPES.get(ritual);
+        IRitualRecipe recipe = findRitualRecipe(ritual, recipes.values(), inventories);
         if(recipe == null) return;
 
         int ticks = recipe.getDuration(ritual);
@@ -188,9 +185,7 @@ public class RitualHandler {
         RitualRecipeContainer container = ritual.createContainer(recipe, core, world, pos, ticks, inventories, Side.SERVER);
 
         if(container != null) {
-            SERVER_ACTIVE_RITUALS.add(container);
-            // TODO better packet system
-            ExoMagica.NETWORK.sendToAllAround(new RitualPacket(pos), new TargetPoint(world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 64));
+            world.spawnEntityInWorld(new EntityRitual(world, container));
         }
     }
 
@@ -228,11 +223,11 @@ public class RitualHandler {
     public static IRitualRecipe findRitualRecipe(IRitual ritual, IRitualCore core, IBlockAccess world, BlockPos pos) {
         Map<String, List<IInventory>> inventories = ritual.getInventories(core, world, pos);
         if(inventories.isEmpty()) return null;
-        List<IRitualRecipe> recipes = RITUALS_RECIPES.get(ritual);
-        return findRitualRecipe(ritual, recipes, inventories);
+        HashBiMap<String, IRitualRecipe> recipes = RITUALS_RECIPES.get(ritual);
+        return findRitualRecipe(ritual, recipes.values(), inventories);
     }
 
-    public static IRitualRecipe findRitualRecipe(IRitual ritual, List<IRitualRecipe> recipes, Map<String, List<IInventory>> inventories) {
+    public static IRitualRecipe findRitualRecipe(IRitual ritual, Collection<IRitualRecipe> recipes, Map<String, List<IInventory>> inventories) {
         for(IRitualRecipe recipe : recipes) {
 
             if(checkRecipe(ritual, recipe, inventories)) {
@@ -241,6 +236,33 @@ public class RitualHandler {
 
         }
         return null;
+    }
+
+    public static String genRitualRecipeName(IRitual ritual, IRitualRecipe recipe) {
+        String name = recipe.getIdentifier(ritual);
+        if(name != null) return name;
+
+        List<String> names = new ArrayList<String>();
+        Map<String, List<Object>> requiredItems = recipe.getRequiredItems(ritual);
+        for(String key : requiredItems.keySet()) {
+            List<Object> items = requiredItems.get(key);
+            if(items == null) continue;
+            names.add(key + ":" + ItemUtils.toString(items));
+        }
+        Collections.sort(names);
+        return Joiner.on(',').join(names);
+    }
+
+    public static String getRitualRecipeName(IRitual ritual, IRitualRecipe recipe) {
+        HashBiMap<String, IRitualRecipe> recipes = RITUALS_RECIPES.get(ritual);
+        if(recipes != null) return recipes.inverse().get(recipe);
+        return genRitualRecipeName(ritual, recipe);
+    }
+
+    public static IRitualRecipe findRitualRecipe(IRitual ritual, String recipe) {
+        HashBiMap<String, IRitualRecipe> recipes = RITUALS_RECIPES.get(ritual);
+        if(recipes == null) return null;
+        return recipes.get(recipe);
     }
 
     public static boolean checkRecipe(IRitual ritual, IRitualRecipe recipe, Map<String, List<IInventory>> inventories) {

@@ -1,6 +1,12 @@
 package exomagica.common.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -107,6 +113,39 @@ public class ItemUtils {
 
         }
         return false;
+    }
+
+    public static String toString(List<Object> items) {
+        List<String> names = new ArrayList<String>();
+        for(Object item : items) {
+            names.add(toString(item));
+        }
+        Collections.sort(names);
+        return "[" + Joiner.on(',').join(names) + "]";
+    }
+
+    public static String toString(Object item) {
+        Class type = getTargetType(item);
+
+        if(type == ItemStack.class) {
+            return item.toString();
+        } else if(type == Item.class) {
+            return ((Item)item).getRegistryName().toString();
+        } else if(type == String.class) {
+            return "oredict_" + (String)item;
+        } else if(type == Block.class) {
+            return ((Block)item).getRegistryName().toString();
+        } else if(type == Fluid.class) {
+            return ((Fluid)item).getUnlocalizedName();
+        } else if(type == FluidStack.class) {
+            return ((FluidStack)item).getUnlocalizedName();
+        } else if(type == List.class) {
+            return toString((List)item);
+        } else if(type == Object[].class) {
+            return toString(Lists.newArrayList((Object[])item));
+        }
+
+        return item.toString();
     }
 
 
