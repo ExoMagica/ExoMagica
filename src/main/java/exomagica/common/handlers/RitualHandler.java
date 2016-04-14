@@ -10,11 +10,19 @@ import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.common.entities.EntityRitual;
 import exomagica.common.utils.ItemUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -23,12 +31,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.*;
 
 public class RitualHandler {
 
@@ -90,53 +93,6 @@ public class RitualHandler {
         return NAMED_RITUALS.get(ritual);
     }
 
-    public final static List<RitualRecipeContainer> SERVER_ACTIVE_RITUALS = new ArrayList<RitualRecipeContainer>();
-
-    @SideOnly(Side.CLIENT)
-    public final static List<RitualRecipeContainer> CLIENT_ACTIVE_RITUALS = new ArrayList<RitualRecipeContainer>();
-
-    @SubscribeEvent
-    public void tick(ServerTickEvent event) {
-        for(int i = 0; i < SERVER_ACTIVE_RITUALS.size(); i++) {
-            RitualRecipeContainer c = SERVER_ACTIVE_RITUALS.get(i);
-            if(c.ticksLeft-- <= 0) {
-                SERVER_ACTIVE_RITUALS.remove(c);
-                if(checkRecipe(c.ritual, c.recipe, c.inventories) &&
-                        c.ritual.checkPattern(c.core, c.world, c.pos)) {
-                    boolean canCraft = c.ritual.finishRitual(c, Side.SERVER);
-                    if(canCraft) craft(c);
-                }
-            } else {
-                if(c.ticksLeft % 20 == 0 && !checkRecipe(c.ritual, c.recipe, c.inventories)) {
-                    SERVER_ACTIVE_RITUALS.remove(c);
-                    continue;
-                }
-                c.ritual.tickRitual(c, Side.SERVER);
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void tick(ClientTickEvent event) {
-        for(int i = 0; i < CLIENT_ACTIVE_RITUALS.size(); i++) {
-            RitualRecipeContainer c = CLIENT_ACTIVE_RITUALS.get(i);
-            if(c.ticksLeft-- <= 0) {
-                CLIENT_ACTIVE_RITUALS.remove(c);
-                if(checkRecipe(c.ritual, c.recipe, c.inventories) &&
-                        c.ritual.checkPattern(c.core, c.world, c.pos)) {
-                    boolean canCraft = c.ritual.finishRitual(c, Side.CLIENT);
-                    if(canCraft) craft(c); // Executed in client-side for instant update
-                }
-            } else {
-                if(c.ticksLeft % 20 == 0 && !checkRecipe(c.ritual, c.recipe, c.inventories)) {
-                    CLIENT_ACTIVE_RITUALS.remove(c);
-                    continue;
-                }
-                c.ritual.tickRitual(c, Side.CLIENT);
-            }
-        }
-    }
-
     @SubscribeEvent
     public void interact(RightClickBlock event) {
         if(event.getSide() != Side.SERVER) return;
@@ -165,8 +121,9 @@ public class RitualHandler {
         event.setCanceled(true);
         event.setUseBlock(Result.DENY);
 
-        for(int i = 0; i < SERVER_ACTIVE_RITUALS.size(); i++) {
-            RitualRecipeContainer c = SERVER_ACTIVE_RITUALS.get(i);
+        List<EntityRitual> rituals = world.getEntitiesWithinAABB(EntityRitual.class, new AxisAlignedBB(pos));
+        for(int i = 0; i < rituals.size(); i++) {
+            RitualRecipeContainer c = rituals.get(i).getContainer();
             if(c != null && c.world == world && c.pos.equals(pos)) return; // There is already a ritual running here
         }
 

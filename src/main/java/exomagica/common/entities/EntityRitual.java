@@ -26,18 +26,19 @@ public class EntityRitual extends Entity {
     public static final DataParameter<BlockPos> RITUAL = EntityDataManager.createKey(EntityRitual.class, DataSerializers.BLOCK_POS);
     public static final DataParameter<String> RECIPE = EntityDataManager.createKey(EntityRitual.class, DataSerializers.STRING);
     public static final DataParameter<Integer> TICKS = EntityDataManager.createKey(EntityRitual.class, DataSerializers.VARINT);
-    public static final DataParameter<Boolean> CANCELLED = EntityDataManager.createKey(EntityRitual.class, DataSerializers.BOOLEAN);
+    public static final DataParameter<Boolean> SUCCESS = EntityDataManager.createKey(EntityRitual.class, DataSerializers.BOOLEAN);
 
+    private NBTTagCompound toLoad = null;
     private RitualRecipeContainer container;
-    private boolean cancelled = false;
+    private boolean success = false;
 
     public EntityRitual(World world) {
         super(world);
         this.container = null;
-        this.dataWatcher.register(RITUAL, null);
-        this.dataWatcher.register(RECIPE, null);
+        this.dataWatcher.register(RITUAL, new BlockPos(this));
+        this.dataWatcher.register(RECIPE, "");
         this.dataWatcher.register(TICKS, 0);
-        this.dataWatcher.register(CANCELLED, false);
+        this.dataWatcher.register(SUCCESS, false);
         this.width = 0;
         this.height = 0;
     }
@@ -48,7 +49,7 @@ public class EntityRitual extends Entity {
         this.dataWatcher.register(RITUAL, container.pos);
         this.dataWatcher.register(RECIPE, RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
         this.dataWatcher.register(TICKS, container.ticksLeft);
-        this.dataWatcher.register(CANCELLED, false);
+        this.dataWatcher.register(SUCCESS, false);
         this.width = 0;
         this.height = 0;
         this.setPosition(container.pos.getX(), container.pos.getY(), container.pos.getZ());
@@ -87,31 +88,43 @@ public class EntityRitual extends Entity {
 
     @Override
     public void onUpdate() {
+        if(container == null) {
+            if(toLoad != null) {
+
+                // Load it after the world is ticking to prevent crashes
+                BlockPos pos = new BlockPos(toLoad.getInteger("RitualX"), toLoad.getInteger("RitualY"), toLoad.getInteger("RitualZ"));
+                loadFromData(pos, toLoad.getString("Recipe"), toLoad.getInteger("TicksLeft"), true);
+                setPosition(pos.getX(), pos.getY(), pos.getZ());
+
+                toLoad = null;
+            }
+            return;
+        }
+
         Side side = worldObj.isRemote ? Side.CLIENT : Side.SERVER;
 
-        if(cancelled) {
-            container.recipe.cancelRecipe(container.ritual);
-            container.ritual.cancelRitual(container, side);
+        if(success) {
             setDead();
             return;
         }
 
         if(container.ticksLeft % 20 == 0) {
-            if(!RitualHandler.checkRecipe(container.ritual, container.recipe, container.inventories)) {
-                cancelled = true;
-                this.dataWatcher.set(CANCELLED, cancelled);
+            if(!RitualHandler.checkRecipe(container.ritual, container.recipe, container.inventories) ||
+                    !container.ritual.checkPattern(container.core, container.world, container.pos)) {
+                success = false;
+                setDead();
                 return;
             }
         }
 
-        if(container.ticksLeft-- <= 0) {
+        if(container.ticksLeft-- <= 0 && side == Side.SERVER) {
             if(RitualHandler.checkRecipe(container.ritual, container.recipe, container.inventories) &&
-                    container.ritual.finishRitual(container, side)) {
-                RitualHandler.craft(container);
-                setDead();
+                    container.ritual.checkPattern(container.core, container.world, container.pos)) {
+                success = true;
+                this.dataWatcher.set(SUCCESS, success);
             } else {
-                cancelled = true;
-                this.dataWatcher.set(CANCELLED, cancelled);
+                success = false;
+                setDead();
             }
             return;
         }
@@ -127,8 +140,8 @@ public class EntityRitual extends Entity {
     @Override
     public void notifyDataManagerChange(DataParameter<?> key) {
         super.notifyDataManagerChange(key);
-        if(key == CANCELLED) {
-            cancelled = dataWatcher.get(CANCELLED).booleanValue();
+        if(key == SUCCESS) {
+            success = dataWatcher.get(SUCCESS).booleanValue();
         } else if(container == null) {
 
             if(dataWatcher.get(RITUAL) != null && dataWatcher.get(RECIPE) != null) {
@@ -141,12 +154,30 @@ public class EntityRitual extends Entity {
     }
 
     @Override
+    public void setDead() {
+        super.setDead();
+        if(container == null) return;
+
+        Side side = worldObj.isRemote ? Side.CLIENT : Side.SERVER;
+        if(success &&
+                container.recipe.finishRecipe(container.ritual) &&
+                container.ritual.finishRitual(container, side)) {
+            RitualHandler.craft(container);
+        } else {
+            container.recipe.cancelRecipe(container.ritual);
+            container.ritual.cancelRitual(container, side);
+        }
+    }
+
+    @Override
     protected void entityInit() {
 
     }
 
     protected void loadFromData(BlockPos pos, String recipeId, int ticksLeft, boolean setDW) {
         isDead = true;
+
+        if(pos == null) return;
 
         IRitualCore core = RitualHandler.getCore(worldObj, pos);
 
@@ -169,7 +200,7 @@ public class EntityRitual extends Entity {
             this.dataWatcher.set(RITUAL, container.pos);
             this.dataWatcher.set(RECIPE, RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
             this.dataWatcher.set(TICKS, container.ticksLeft);
-            this.dataWatcher.set(CANCELLED, false);
+            this.dataWatcher.set(SUCCESS, false);
         }
 
         isDead = false; // If everything was loaded correctly, keep it spawned
@@ -177,19 +208,34 @@ public class EntityRitual extends Entity {
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound nbt) {
-        BlockPos pos = new BlockPos(nbt.getInteger("RitualX"), nbt.getInteger("RitualY"), nbt.getInteger("RitualZ"));
-        loadFromData(pos, nbt.getString("Recipe"), nbt.getInteger("TicksLeft"), true);
-
-        this.setPosition(container.pos.getX(), container.pos.getY(), container.pos.getZ());
+        toLoad = nbt;
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound nbt) {
-        container.writeToNBT(nbt);
-        nbt.setInteger("RitualX", container.pos.getX());
-        nbt.setInteger("RitualY", container.pos.getY());
-        nbt.setInteger("RitualZ", container.pos.getZ());
-        nbt.setInteger("TicksLeft", container.ticksLeft);
-        nbt.setString("Recipe", RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
+        if(container != null) {
+            container.writeToNBT(nbt);
+            nbt.setInteger("RitualX", container.pos.getX());
+            nbt.setInteger("RitualY", container.pos.getY());
+            nbt.setInteger("RitualZ", container.pos.getZ());
+            nbt.setInteger("TicksLeft", container.ticksLeft);
+            nbt.setString("Recipe", RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
+        }
     }
+
+    @Override
+    public void writeToNBT(NBTTagCompound tagCompund) {
+        if(container != null) super.writeToNBT(tagCompund);
+    }
+
+    public RitualRecipeContainer getContainer() {
+        return container;
+    }
+
+    public void finishRitual(boolean success) {
+        this.dataWatcher.set(SUCCESS, success);
+        this.success = success;
+        if(!success) setDead();
+    }
+
 }

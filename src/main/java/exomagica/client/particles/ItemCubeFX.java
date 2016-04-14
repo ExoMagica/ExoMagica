@@ -1,6 +1,7 @@
 package exomagica.client.particles;
 
 import exomagica.client.handlers.ParticleRenderer;
+import exomagica.client.particles.animation.IParticleAnimation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -16,8 +17,8 @@ public class ItemCubeFX extends CubeFX {
 
     protected TextureManager manager;
 
-    public ItemCubeFX(World w, double x, double y, double z, ItemStack item) {
-        super(w, x, y, z, 1, 1, 1);
+    public ItemCubeFX(World w, double x, double y, double z, ItemStack item, IParticleAnimation ... animations) {
+        super(w, x, y, z, 1, 1, 1, animations);
         Minecraft mc = Minecraft.getMinecraft();
 
         this.particleTexture = mc.getRenderItem().getItemModelMesher().getParticleIcon(item.getItem(), item.getMetadata());

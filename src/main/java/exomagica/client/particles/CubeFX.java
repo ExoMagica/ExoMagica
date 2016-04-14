@@ -1,6 +1,7 @@
 package exomagica.client.particles;
 
 import exomagica.client.handlers.ParticleRenderer;
+import exomagica.client.particles.animation.IParticleAnimation;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.world.World;
@@ -16,8 +17,8 @@ public class CubeFX extends ExoFX {
     protected float rMod, rX, rY, rZ;
     protected ModelRenderer model = BOX;
 
-    public CubeFX(World w, double x, double y, double z, float r, float g, float b) {
-        super(w, x, y, z, ParticleRenderer.CUBE_PARTICLES);
+    public CubeFX(World w, double x, double y, double z, float r, float g, float b, IParticleAnimation ... animations) {
+        super(w, x, y, z, ParticleRenderer.CUBE_PARTICLES, animations);
         this.particleRed = r;
         this.particleGreen = g;
         this.particleBlue = b;

@@ -1,11 +1,15 @@
 package exomagica.client.particles;
 
-import java.util.ArrayDeque;
+import com.google.common.collect.ImmutableList;
+import exomagica.client.particles.animation.IParticleAnimation;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayDeque;
+import java.util.List;
 
 public class ExoFX extends EntityFX {
 
@@ -13,22 +17,30 @@ public class ExoFX extends EntityFX {
     protected float rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ;
     protected boolean noClip = false;
 
+    protected final List<IParticleAnimation> animations;
+
     protected boolean alphaEffect = true, scaleEffect = true;
     protected boolean hasFinalCoords = false;
     protected double finalX, finalY, finalZ, finalRange;
 
-    public ExoFX(World world, double x, double y, double z, ArrayDeque<ExoFX> array) {
+    public ExoFX(World world, double x, double y, double z, ArrayDeque<ExoFX> array, IParticleAnimation ... animations) {
         super(world, x, y, z);
         this.array = array;
+        this.animations = ImmutableList.copyOf(animations);
     }
 
     @Override
     public void renderParticle(VertexBuffer worldRendererIn, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
         addToQueue(this.array, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+
+        float ticks = particleAge + partialTicks;
+        for(IParticleAnimation animation : animations) {
+            animation.animate(this, ticks, particleMaxAge);
+        }
     }
 
-    public void addToQueue(ArrayDeque array, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+    protected void addToQueue(ArrayDeque array, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
         this.rotationX = rotationX;
         this.rotationZ = rotationZ;
         this.rotationYZ = rotationYZ;
