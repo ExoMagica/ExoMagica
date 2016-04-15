@@ -1,0 +1,37 @@
+{
+  "block.chalk.place": {
+    "sounds": [
+      "exomagica:chalk/chalk1",
+      "exomagica:chalk/chalk2",
+      "exomagica:chalk/chalk3",
+      "exomagica:chalk/chalk4",
+      "exomagica:chalk/chalk5",
+      "exomagica:chalk/chalk6"
+    ],
+    "category": "block"
+  },
+  "ritual.start": {
+    "sounds": [
+      "exomagica:ritual/ritual_start"
+    ],
+    "category": "ambient"
+  },
+  "ritual.end": {
+    "sounds": [
+      "exomagica:ritual/ritual_end"
+    ],
+    "category": "ambient"
+  },
+  "ritual.cancel": {
+    "sounds": [
+      "exomagica:ritual/ritual_cancel"
+    ],
+    "category": "ambient"
+  },
+  "ritual.loop": {
+    "sounds": [
+      "exomagica:ritual/ritual_loop"
+    ],
+    "category": "ambient"
+  }
+}

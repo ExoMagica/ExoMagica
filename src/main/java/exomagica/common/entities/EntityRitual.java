@@ -52,7 +52,7 @@ public class EntityRitual extends Entity {
         this.dataWatcher.register(SUCCESS, false);
         this.width = 0;
         this.height = 0;
-        this.setPosition(container.pos.getX(), container.pos.getY(), container.pos.getZ());
+        this.setPosition(container.pos.getX() + 0.5, container.pos.getY() + 0.5, container.pos.getZ() + 0.5);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class EntityRitual extends Entity {
                 // Load it after the world is ticking to prevent crashes
                 BlockPos pos = new BlockPos(toLoad.getInteger("RitualX"), toLoad.getInteger("RitualY"), toLoad.getInteger("RitualZ"));
                 loadFromData(pos, toLoad.getString("Recipe"), toLoad.getInteger("TicksLeft"), true);
-                setPosition(pos.getX(), pos.getY(), pos.getZ());
+                setPosition(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
                 toLoad = null;
             }

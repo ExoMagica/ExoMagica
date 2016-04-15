@@ -35,9 +35,9 @@ public class CubeFX extends ExoFX {
     public void renderExoParticle(float partialTicks) {
         GL11.glPushMatrix();
 
-        float x = (float)(prevPosX + (posX - prevPosX) * partialTicks - interpPosX);
-        float y = (float)(prevPosY + (posY - prevPosY) * partialTicks - interpPosY);
-        float z = (float)(prevPosZ + (posZ - prevPosZ) * partialTicks - interpPosZ);
+        double x = prevPosX + (posX - prevPosX) * partialTicks - interpPosX + offsetX;
+        double y = prevPosY + (posY - prevPosY) * partialTicks - interpPosY + offsetY;
+        double z = prevPosZ + (posZ - prevPosZ) * partialTicks - interpPosZ + offsetZ;
         GL11.glTranslated(x, y, z);
 
         float scale = (getScale(partialTicks) + 0.1F) / 10F;

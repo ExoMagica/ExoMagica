@@ -1,19 +1,24 @@
 package exomagica.common.blocks;
 
 import exomagica.ExoContent;
+import exomagica.ExoMagica;
 import java.util.List;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -25,10 +30,15 @@ public class BlockChalk extends Block implements IBlockColor {
 
     public static final PropertyEnum<ChalkType> TYPE = PropertyEnum.create("type", ChalkType.class);
 
+    private final SoundType SOUND = new SoundType(1, 1, SoundEvents.block_sand_break, SoundEvents.block_sand_step,
+                                                SoundEvent.soundEventRegistry.getObject(new ResourceLocation(ExoMagica.MODID, "block.chalk.place")),
+                                                SoundEvents.block_sand_hit, SoundEvents.block_sand_fall);
+
     private final AxisAlignedBB box;
 
     public BlockChalk() {
         super(Material.circuits);
+        this.setStepSound(SOUND);
         this.setUnlocalizedName("chalk");
         box = new AxisAlignedBB(0F, 0.0F, 0F, 1F, 0.0625F, 1F);
         this.setLightOpacity(0);

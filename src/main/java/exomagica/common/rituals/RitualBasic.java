@@ -6,11 +6,17 @@ import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.client.particles.ColorfulFX;
+import exomagica.client.particles.ExoFX;
 import exomagica.client.particles.ItemCubeFX;
+import exomagica.client.particles.animation.OffsetAnimation;
 import exomagica.client.particles.animation.RotateAnimation;
 import exomagica.common.blocks.BlockChalk;
 import exomagica.common.blocks.BlockChalk.ChalkType;
 import exomagica.common.tiles.TileAltar;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EffectRenderer;
@@ -22,11 +28,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import scala.actors.threadpool.Arrays;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 // "BASIC"????? Yep, we are not creative enough for these names :D
 // WHY DON'T YOU SUGGEST SOME?
@@ -135,7 +136,9 @@ public class RitualBasic implements IRitual {
                 if(stack == null) continue;
                 RotateAnimation animation = new RotateAnimation(2.5F, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5,
                         c.pos.getX() + 0.5, c.pos.getY() + 1.75, c.pos.getZ() + 0.5);
-                ItemCubeFX fx = new ItemCubeFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, stack, animation);
+                OffsetAnimation offset = new OffsetAnimation(0.25);
+                ItemCubeFX fx = new ItemCubeFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, stack, animation, offset);
+                fx.setOwner(c);
                 fx.multipleParticleScaleBy((float)(0.5 * Math.random()) + 0.1F);
                 fx.setAlphaEffect(false);
                 fx.setScaleEffect(false);
@@ -148,8 +151,21 @@ public class RitualBasic implements IRitual {
     }
 
     @Override
-    public void cancelRitual(RitualRecipeContainer container, Side side) {
-
+    public void cancelRitual(RitualRecipeContainer c, Side side) {
+        if(side == Side.CLIENT) {
+            System.out.println("CANCEL CLIENT");
+            for(ExoFX fx : ExoFX.PARTICLES) {
+                if(fx.getOwner() == c) {
+                    fx.clearAnimations();
+                    fx.setAlphaEffect(true);
+                    fx.setAge(0);
+                    fx.setMaxAge(50);
+                    fx.setGravity(0.2F);
+                    fx.randomizeSpeed();
+                    fx.multiplyVelocity(0.05F);
+                }
+            }
+        }
     }
 
     public static class RitualBasicRecipe implements IRitualRecipe<RitualBasic> {

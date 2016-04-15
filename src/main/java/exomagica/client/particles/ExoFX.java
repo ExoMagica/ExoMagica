@@ -1,23 +1,28 @@
 package exomagica.client.particles;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import exomagica.client.particles.animation.IParticleAnimation;
+import java.util.ArrayDeque;
+import java.util.List;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayDeque;
-import java.util.List;
-
 public class ExoFX extends EntityFX {
+
+    public static final ArrayDeque<ExoFX> PARTICLES = new ArrayDeque<ExoFX>();
 
     protected ArrayDeque<ExoFX> array = null;
     protected float rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ;
     protected boolean noClip = false;
+    protected double offsetX, offsetY, offsetZ;
 
     protected final List<IParticleAnimation> animations;
+
+    protected Object owner = null;
+    protected boolean registered = false;
 
     protected boolean alphaEffect = true, scaleEffect = true;
     protected boolean hasFinalCoords = false;
@@ -26,7 +31,7 @@ public class ExoFX extends EntityFX {
     public ExoFX(World world, double x, double y, double z, ArrayDeque<ExoFX> array, IParticleAnimation ... animations) {
         super(world, x, y, z);
         this.array = array;
-        this.animations = ImmutableList.copyOf(animations);
+        this.animations = Lists.newArrayList(animations);
     }
 
     @Override
@@ -34,10 +39,23 @@ public class ExoFX extends EntityFX {
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
         addToQueue(this.array, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
 
-        float ticks = particleAge + partialTicks;
-        for(IParticleAnimation animation : animations) {
-            animation.animate(this, ticks, particleMaxAge);
+        if(!animations.isEmpty()) {
+            float ticks = particleAge + partialTicks;
+            setOffset(0, 0, 0);
+            for(IParticleAnimation animation : animations) {
+                animation.animate(this, ticks, particleMaxAge);
+            }
         }
+
+        if(!registered) {
+            if(!PARTICLES.contains(this)) PARTICLES.add(this);
+            registered = true;
+        }
+    }
+
+    @Override
+    public int getFXLayer() {
+        return 0;
     }
 
     protected void addToQueue(ArrayDeque array, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
@@ -79,6 +97,12 @@ public class ExoFX extends EntityFX {
         }
     }
 
+    @Override
+    public void setExpired() {
+        super.setExpired();
+        PARTICLES.remove(this);
+    }
+
     public float getRedColorF(float partialTicks) {
         return getRedColorF();
     }
@@ -112,7 +136,7 @@ public class ExoFX extends EntityFX {
     }
 
     public void randomizeSpeed() {
-        setSpeed((rand.nextGaussian() * 2) - 1, (rand.nextGaussian() * 2) - 1, (rand.nextGaussian() * 2) - 1);
+        setSpeed((rand.nextDouble() - 0.5) * 2, (rand.nextDouble() - 0.5) * 2, (rand.nextDouble() - 0.5) * 2);
     }
 
     public void setGravity(float gravity) {
@@ -151,11 +175,43 @@ public class ExoFX extends EntityFX {
         this.particleMaxAge = maxAge;
     }
 
+    public void setOffset(double offsetX, double offsetY, double offsetZ) {
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.offsetZ = offsetZ;
+    }
+
+    public void addOffset(double offsetX, double offsetY, double offsetZ) {
+        this.offsetX += offsetX;
+        this.offsetY += offsetY;
+        this.offsetZ += offsetZ;
+    }
+
+    public void addAnimation(IParticleAnimation animation) {
+        animations.add(animation);
+    }
+
+    public List<IParticleAnimation> getAnimations() {
+        return animations;
+    }
+
+    public void clearAnimations() {
+        animations.clear();
+    }
+
+    public Object getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Object owner) {
+        this.owner = owner;
+    }
+
     public void renderExoParticle(float partialTicks) {
         float f10 = 0.5F * getScale(partialTicks);
-        float f11 = (float)(prevPosX + (posX - prevPosX) * partialTicks - interpPosX);
-        float f12 = (float)(prevPosY + (posY - prevPosY) * partialTicks - interpPosY);
-        float f13 = (float)(prevPosZ + (posZ - prevPosZ) * partialTicks - interpPosZ);
+        float f11 = (float)(prevPosX + (posX - prevPosX) * partialTicks - interpPosX + offsetX);
+        float f12 = (float)(prevPosY + (posY - prevPosY) * partialTicks - interpPosY + offsetY);
+        float f13 = (float)(prevPosZ + (posZ - prevPosZ) * partialTicks - interpPosZ + offsetZ);
 
         GL11.glColor4f(getRedColorF(partialTicks), getGreenColorF(partialTicks), getBlueColorF(partialTicks), getAlpha(partialTicks));
 
