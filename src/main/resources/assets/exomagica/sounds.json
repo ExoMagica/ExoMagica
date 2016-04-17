@@ -30,7 +30,10 @@
   },
   "ritual.loop": {
     "sounds": [
-      "exomagica:ritual/ritual_loop"
+      {
+        "name": "exomagica:ritual/ritual_loop",
+        "stream": true
+      }
     ],
     "category": "ambient"
   }

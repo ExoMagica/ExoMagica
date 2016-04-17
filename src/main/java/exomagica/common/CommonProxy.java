@@ -2,6 +2,7 @@ package exomagica.common;
 
 import exomagica.ExoContent;
 import exomagica.ExoMagica;
+import exomagica.ExoSounds;
 import exomagica.api.IExoMagicaAPI;
 import exomagica.common.capabilities.IPlayerData;
 import exomagica.common.capabilities.PlayerData.PlayerDataFactory;
@@ -59,6 +60,14 @@ public class CommonProxy {
 
     public void registerPackets(SimpleNetworkWrapper network) {
 
+    }
+
+    public void registerSounds() {
+        GameRegistry.register(ExoSounds.CHALK_PLACE);
+        GameRegistry.register(ExoSounds.RITUAL_START);
+        GameRegistry.register(ExoSounds.RITUAL_END);
+        GameRegistry.register(ExoSounds.RITUAL_CANCEL);
+        GameRegistry.register(ExoSounds.RITUAL_LOOP);
     }
 
     public void registerRituals(IExoMagicaAPI api) {
