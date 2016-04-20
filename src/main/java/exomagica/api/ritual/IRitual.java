@@ -43,13 +43,13 @@ public interface IRitual {
      * @param core The core of the ritual
      * @param world The world
      * @param pos The position
-     * @param ticksLeft The remaining ticks
+     * @param ticks The number of ticks
      * @param inventories The inventories of this ritual
      * @param side The side
      * @return A new RitualRecipeContainer.
      */
     RitualRecipeContainer createContainer(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos,
-                                          int ticksLeft, Map<String, List<IInventory>> inventories, Side side);
+                                          int ticks, Map<String, List<IInventory>> inventories, Side side);
 
     /**
      * Fired when the ritual finishes

@@ -1,6 +1,7 @@
 package exomagica.common.rituals;
 
 import exomagica.ExoContent;
+import exomagica.ExoSounds;
 import exomagica.api.ritual.IRitual;
 import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
@@ -99,8 +100,13 @@ public class RitualBasic implements IRitual {
 
     @Override
     public RitualRecipeContainer createContainer(IRitualRecipe recipe, IRitualCore core, IBlockAccess world, BlockPos pos,
-                                             int ticksLeft, Map<String, List<IInventory>> inventories, Side side) {
-        return new RitualRecipeContainer(this, recipe, core, world, pos, inventories, ticksLeft);
+                                                 int ticks, Map<String, List<IInventory>> inventories, Side side) {
+        RitualRecipeContainer c = new RitualRecipeContainer(this, recipe, core, world, pos, inventories, ticks);
+        c.loopSound = ExoSounds.RITUAL_LOOP;
+        c.startSound = ExoSounds.RITUAL_START;
+        c.cancelSound = ExoSounds.RITUAL_CANCEL;
+        c.timedSounds.put(28, ExoSounds.RITUAL_END);
+        return c;
     }
 
     @Override
@@ -115,7 +121,9 @@ public class RitualBasic implements IRitual {
                     fx.setNoClip(true);
                     fx.randomizeSpeed();
                     fx.multiplyVelocity(0.1F);
-                    fx.setMaxAge(80);
+                    fx.setAlphaEffect(false);
+                    fx.setScaleEffect(false);
+                    fx.setMaxAge(1);
                     renderer.addEffect(fx);
                 }
 
@@ -131,19 +139,18 @@ public class RitualBasic implements IRitual {
             for(EnumFacing facing : EnumFacing.HORIZONTALS) {
                 BlockPos pos = c.pos.offset(facing, 3);
 
-                TileAltar altar = (TileAltar)c.world.getTileEntity(pos);
+                TileAltar altar = (TileAltar) c.world.getTileEntity(pos);
                 ItemStack stack = altar.getStackInSlot(0);
                 if(stack == null) continue;
                 RotateAnimation animation = new RotateAnimation(2.5F, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5,
                         c.pos.getX() + 0.5, c.pos.getY() + 1.75, c.pos.getZ() + 0.5);
                 OffsetAnimation offset = new OffsetAnimation(0.25);
-                ItemCubeFX fx = new ItemCubeFX((World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, stack, animation, offset);
+                ItemCubeFX fx = new ItemCubeFX((World) c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5, stack, animation, offset);
                 fx.setOwner(c);
-                fx.multipleParticleScaleBy((float)(0.5 * Math.random()) + 0.1F);
+                fx.multipleParticleScaleBy((float) (0.5 * Math.random()) + 0.1F);
                 fx.setAlphaEffect(false);
                 fx.setScaleEffect(false);
                 fx.setMaxAge(40);
-                //fx.enableFinalCoords(c.pos.getX() + 0.5F, c.pos.getY() + 1.75F, c.pos.getZ() + 0.5F, isBig ? 0.25F : 0.01F, 500);
                 fx.setNoClip(true);
                 renderer.addEffect(fx);
             }
@@ -153,7 +160,6 @@ public class RitualBasic implements IRitual {
     @Override
     public void cancelRitual(RitualRecipeContainer c, Side side) {
         if(side == Side.CLIENT) {
-            System.out.println("CANCEL CLIENT");
             for(ExoFX fx : ExoFX.PARTICLES) {
                 if(fx.getOwner() == c) {
                     fx.clearAnimations();

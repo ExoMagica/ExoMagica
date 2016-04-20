@@ -1,7 +1,7 @@
 package exomagica.common.blocks;
 
 import exomagica.ExoContent;
-import exomagica.ExoMagica;
+import exomagica.ExoSounds;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -17,8 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -31,8 +29,7 @@ public class BlockChalk extends Block implements IBlockColor {
     public static final PropertyEnum<ChalkType> TYPE = PropertyEnum.create("type", ChalkType.class);
 
     private final SoundType SOUND = new SoundType(1, 1, SoundEvents.block_sand_break, SoundEvents.block_sand_step,
-                                                SoundEvent.soundEventRegistry.getObject(new ResourceLocation(ExoMagica.MODID, "block.chalk.place")),
-                                                SoundEvents.block_sand_hit, SoundEvents.block_sand_fall);
+                                    ExoSounds.CHALK_PLACE, SoundEvents.block_sand_hit, SoundEvents.block_sand_fall);
 
     private final AxisAlignedBB box;
 
