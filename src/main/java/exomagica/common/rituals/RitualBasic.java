@@ -6,9 +6,9 @@ import exomagica.api.ritual.IRitual;
 import exomagica.api.ritual.IRitualCore;
 import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
-import exomagica.client.particles.ColorfulFX;
 import exomagica.client.particles.ExoFX;
 import exomagica.client.particles.ItemCubeFX;
+import exomagica.client.particles.TwinkleFX;
 import exomagica.client.particles.animation.OffsetAnimation;
 import exomagica.client.particles.animation.RotateAnimation;
 import exomagica.common.blocks.BlockChalk;
@@ -116,20 +116,32 @@ public class RitualBasic implements IRitual {
             if(finish) {
                 EffectRenderer renderer = Minecraft.getMinecraft().effectRenderer;
 
-                for(int i = 0; i < 25; i++) {
-                    ColorfulFX fx = new ColorfulFX((World)c.world, c.pos.getX() + 0.5, c.pos.getY() + 1.75, c.pos.getZ() + 0.5, true);
-                    fx.setNoClip(true);
-                    fx.randomizeSpeed();
-                    fx.multiplyVelocity(0.1F);
-                    fx.setAlphaEffect(false);
-                    fx.setScaleEffect(false);
-                    fx.setMaxAge(1);
-                    renderer.addEffect(fx);
+                spawnTwinkleParticles(renderer, (World)c.world, c.pos.getX() + 0.5, c.pos.getY() + 1.75, c.pos.getZ() + 0.5);
+
+                for(EnumFacing facing : EnumFacing.HORIZONTALS) {
+                    BlockPos pos = c.pos.offset(facing, 3);
+                    spawnTwinkleParticles(renderer, (World)c.world, pos.getX() + 0.5, pos.getY() + 1.75, pos.getZ() + 0.5);
                 }
 
             }
         }
         return finish;
+    }
+
+    private void spawnTwinkleParticles(EffectRenderer renderer, World w, double x, double y, double z) {
+        for(int i = 0; i < 5; i++) {
+            TwinkleFX fx = new TwinkleFX(w, x, y, z, true);
+            fx.setOffset((Math.random() * 0.4) - 0.2, (Math.random() * 0.4) - 0.2, (Math.random() * 0.4) - 0.2);
+            fx.setNoClip(true);
+            fx.multipleParticleScaleBy(0.5F);
+            fx.randomizeSpeed();
+            fx.multiplyVelocity(0.02F);
+            fx.setAlphaEffect(true);
+            fx.setScaleEffect(true);
+            fx.setMaxAge(20);
+            fx.setAnimationTicks(20);
+            renderer.addEffect(fx);
+        }
     }
 
     @Override
@@ -162,13 +174,11 @@ public class RitualBasic implements IRitual {
         if(side == Side.CLIENT) {
             for(ExoFX fx : ExoFX.PARTICLES) {
                 if(fx.getOwner() == c) {
-                    fx.clearAnimations();
                     fx.setAlphaEffect(true);
-                    fx.setAge(0);
-                    fx.setMaxAge(50);
+                    fx.setAnimationTicks(30);
                     fx.setGravity(0.2F);
-                    fx.randomizeSpeed();
-                    fx.multiplyVelocity(0.05F);
+                    fx.setSpeed(Math.random() - 0.5, Math.random() - 0.25, Math.random() - 0.5);
+                    fx.multiplyVelocity(0.2F);
                 }
             }
         }

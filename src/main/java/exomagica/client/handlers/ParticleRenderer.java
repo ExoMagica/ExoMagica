@@ -17,10 +17,14 @@ import org.lwjgl.opengl.GL11;
 public class ParticleRenderer {
 
     public static final ResourceLocation RADIAL_TEXTURE = new ResourceLocation(ExoMagica.MODID, "textures/particle/radial.png");
+    public static final ResourceLocation TWINKLE_TEXTURE = new ResourceLocation(ExoMagica.MODID, "textures/particle/twinkle.png");
     public static final ResourceLocation CUBE_TEXTURE = new ResourceLocation(ExoMagica.MODID, "textures/particle/pixel.png"); // TODO remove this and make a better render code
 
     public static final ArrayDeque<ExoFX> RADIAL_PARTICLES = new ArrayDeque<ExoFX>();
     public static final ArrayDeque<ExoFX> RADIAL_NO_DEPTH_PARTICLES = new ArrayDeque<ExoFX>();
+
+    public static final ArrayDeque<ExoFX> TWINKLE_PARTICLES = new ArrayDeque<ExoFX>();
+    public static final ArrayDeque<ExoFX> TWINKLE_NO_DEPTH_PARTICLES = new ArrayDeque<ExoFX>();
 
     public static final ArrayDeque<ExoFX> CUBE_PARTICLES = new ArrayDeque<ExoFX>();
     public static final ArrayDeque<ExoFX> ITEM_CUBE_PARTICLES = new ArrayDeque<ExoFX>();
@@ -46,6 +50,9 @@ public class ParticleRenderer {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.003921569F);
         GL11.glDisable(GL11.GL_LIGHTING);
+
+        /* TWINKLE */
+        renderTwinkle(tex, partialTicks);
 
         /* RADIAL */
         renderRadial(tex, partialTicks);
@@ -76,6 +83,30 @@ public class ParticleRenderer {
             GL11.glBegin(GL11.GL_QUADS);
             for(ExoFX particle : RADIAL_NO_DEPTH_PARTICLES) particle.renderExoParticle(partialTicks);
             RADIAL_NO_DEPTH_PARTICLES.clear();
+            GL11.glEnd();
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+        }
+    }
+
+    public void renderTwinkle(TextureManager tex, float partialTicks) {
+        tex.bindTexture(TWINKLE_TEXTURE);
+
+        // DEPTH
+
+        if(!TWINKLE_PARTICLES.isEmpty()) {
+            GL11.glBegin(GL11.GL_QUADS);
+            for(ExoFX particle : TWINKLE_PARTICLES) particle.renderExoParticle(partialTicks);
+            TWINKLE_PARTICLES.clear();
+            GL11.glEnd();
+        }
+
+        // NO DEPTH
+
+        if(!TWINKLE_NO_DEPTH_PARTICLES.isEmpty()) {
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glBegin(GL11.GL_QUADS);
+            for(ExoFX particle : TWINKLE_NO_DEPTH_PARTICLES) particle.renderExoParticle(partialTicks);
+            TWINKLE_NO_DEPTH_PARTICLES.clear();
             GL11.glEnd();
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }

@@ -25,6 +25,7 @@ public class ExoFX extends EntityFX {
     protected boolean registered = false;
 
     protected boolean alphaEffect = true, scaleEffect = true;
+    protected float animationTicks = 40;
     protected boolean hasFinalCoords = false;
     protected double finalX, finalY, finalZ, finalRange;
 
@@ -116,15 +117,15 @@ public class ExoFX extends EntityFX {
     }
 
     public float getAlpha(float partialTicks) {
-        if(alphaEffect && particleMaxAge - 100 < particleAge) {
-            return particleAlpha * ((particleMaxAge - particleAge) / 100F);
+        if(alphaEffect && particleMaxAge - animationTicks < particleAge) {
+            return particleAlpha * ((particleMaxAge - particleAge) / animationTicks);
         }
         return particleAlpha;
     }
 
     public float getScale(float partialTicks) {
-        if(scaleEffect && particleMaxAge - 40 < particleAge) {
-            return particleScale * ((particleMaxAge - particleAge) / 40F);
+        if(scaleEffect && particleMaxAge - animationTicks < particleAge) {
+            return particleScale * ((particleMaxAge - particleAge) / animationTicks);
         }
         return particleScale;
     }
@@ -139,12 +140,24 @@ public class ExoFX extends EntityFX {
         setSpeed((rand.nextDouble() - 0.5) * 2, (rand.nextDouble() - 0.5) * 2, (rand.nextDouble() - 0.5) * 2);
     }
 
+    @Override
+    public EntityFX multiplyVelocity(float multiplier) {
+        this.xSpeed *= multiplier;
+        this.ySpeed *= multiplier;
+        this.zSpeed *= multiplier;
+        return this;
+    }
+
     public void setGravity(float gravity) {
         this.particleGravity = gravity;
     }
 
     public void setAge(int age) {
         this.particleAge = age;
+    }
+
+    public void setAnimationTicks(int ticks) {
+        animationTicks = ticks;
     }
 
     public void setAlphaEffect(boolean alphaEffect) {

@@ -7,7 +7,8 @@ import net.minecraft.item.ItemStack;
 public interface IRitualRecipe<T extends IRitual> {
 
     /**
-     * Returns the unique identifier for this ritual.
+     * Returns the unique identifier of this recipe for this ritual.
+     * It needs to be the same in the client and the server for synchronization
      * @param ritual The ritual
      * @return The identifier or NULL to use the generated identifier.
      */
