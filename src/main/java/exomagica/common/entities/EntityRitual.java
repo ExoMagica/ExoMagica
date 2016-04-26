@@ -47,7 +47,7 @@ public class EntityRitual extends Entity {
         this.dataWatcher.register(RITUAL, new BlockPos(this));
         this.dataWatcher.register(RECIPE, "");
         this.dataWatcher.register(TICKS_LEFT, 0);
-        this.dataWatcher.register(TOTAL_TICKS, null);
+        this.dataWatcher.register(TOTAL_TICKS, 100);
         this.dataWatcher.register(SUCCESS, false);
         this.width = 0;
         this.height = 0;

@@ -7,6 +7,7 @@ import exomagica.api.IExoMagicaAPI;
 import exomagica.common.capabilities.IPlayerData;
 import exomagica.common.capabilities.PlayerData.PlayerDataFactory;
 import exomagica.common.capabilities.PlayerData.PlayerDataStorage;
+import exomagica.common.entities.EntityNode;
 import exomagica.common.entities.EntityRitual;
 import exomagica.common.handlers.CapabilityHandler;
 import exomagica.common.handlers.RitualHandler;
@@ -50,6 +51,7 @@ public class CommonProxy {
 
     public void registerEntities() {
         EntityRegistry.registerModEntity(EntityRitual.class, "ritual", 0, ExoMagica.MODID, 48, 1, false);
+        EntityRegistry.registerModEntity(EntityNode.class, "node", 1, ExoMagica.MODID, 48, 1, true);
     }
 
     public void registerHandlers() {

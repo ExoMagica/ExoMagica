@@ -2,8 +2,11 @@ package exomagica.client;
 
 import exomagica.ExoContent;
 import exomagica.client.blocks.AltarRenderer;
+import exomagica.client.entities.RenderNothing;
 import exomagica.client.handlers.ParticleRenderer;
 import exomagica.common.CommonProxy;
+import exomagica.common.entities.EntityNode;
+import exomagica.common.entities.EntityRitual;
 import exomagica.common.tiles.TileAltar;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -46,6 +50,10 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void registerEntities() {
         super.registerEntities();
+
+        // TODO do we really need to specify a render for these?
+        RenderingRegistry.registerEntityRenderingHandler(EntityRitual.class, new RenderNothing.RenderNothingFactory());
+        RenderingRegistry.registerEntityRenderingHandler(EntityNode.class, new RenderNothing.RenderNothingFactory());
     }
 
     @Override
