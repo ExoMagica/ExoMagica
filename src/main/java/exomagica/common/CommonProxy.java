@@ -79,11 +79,6 @@ public class CommonProxy {
     public void registerRecipes(IExoMagicaAPI api) {
         api.registerRecipe("basic", new RitualBasicRecipe(new ItemStack(Items.elytra), Items.diamond,
                 Items.flint_and_steel, FluidRegistry.LAVA, Items.coal, Blocks.torch));
-
-        // Test recipe. TODO remove it
-        api.registerRecipe("basic", new RitualBasicRecipe(new ItemStack(Items.diamond), Items.diamond,
-                new ItemStack(Blocks.wool, 1, 2), new ItemStack(Blocks.wool, 1, 5),
-                new ItemStack(Blocks.wool, 1, 14), new ItemStack(Blocks.wool, 1, 9)));
     }
 
 

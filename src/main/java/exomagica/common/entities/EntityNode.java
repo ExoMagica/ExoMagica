@@ -46,7 +46,8 @@ public class EntityNode extends Entity implements INode {
 
     @Override
     protected void entityInit() {
-
+        width = 0;
+        height = 0;
     }
 
     @Override

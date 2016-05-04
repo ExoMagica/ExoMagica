@@ -26,6 +26,7 @@ public class SpellHandler {
             int holdTicks = data.getHoldTicks() + 1;
             data.setHoldTicks(holdTicks);
             System.out.println("TICK: " + holdTicks);
+            // TODO fix
             if(holdTicks > 10) {
                 System.out.println("STOP");
                 data.setHoldItem(null);

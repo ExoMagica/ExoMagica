@@ -49,8 +49,6 @@ public class EntityRitual extends Entity {
         this.dataWatcher.register(TICKS_LEFT, 0);
         this.dataWatcher.register(TOTAL_TICKS, 100);
         this.dataWatcher.register(SUCCESS, false);
-        this.width = 0;
-        this.height = 0;
     }
 
     public EntityRitual(World world, RitualRecipeContainer container) {
@@ -61,8 +59,6 @@ public class EntityRitual extends Entity {
         this.dataWatcher.register(TICKS_LEFT, container.ticksLeft);
         this.dataWatcher.register(TOTAL_TICKS, container.totalTicks);
         this.dataWatcher.register(SUCCESS, false);
-        this.width = 0;
-        this.height = 0;
         this.setPosition(container.pos.getX() + 0.5, container.pos.getY() + 0.5, container.pos.getZ() + 0.5);
     }
 
@@ -203,7 +199,8 @@ public class EntityRitual extends Entity {
 
     @Override
     protected void entityInit() {
-
+        this.width = 0;
+        this.height = 0;
     }
 
     private void loadFromData(BlockPos pos, String recipeId, int maxTicks, int ticksLeft, boolean setDW) {

@@ -18,7 +18,7 @@ public class ParticleRenderer {
 
     public static final ResourceLocation RADIAL_TEXTURE = new ResourceLocation(ExoMagica.MODID, "textures/particle/radial.png");
     public static final ResourceLocation TWINKLE_TEXTURE = new ResourceLocation(ExoMagica.MODID, "textures/particle/twinkle.png");
-    public static final ResourceLocation CUBE_TEXTURE = new ResourceLocation(ExoMagica.MODID, "textures/particle/pixel.png"); // TODO remove this and make a better render code
+    public static final ResourceLocation CUBE_TEXTURE = new ResourceLocation(ExoMagica.MODID, "textures/particle/pixel.png");
 
     public static final ArrayDeque<ExoFX> RADIAL_PARTICLES = new ArrayDeque<ExoFX>();
     public static final ArrayDeque<ExoFX> RADIAL_NO_DEPTH_PARTICLES = new ArrayDeque<ExoFX>();
