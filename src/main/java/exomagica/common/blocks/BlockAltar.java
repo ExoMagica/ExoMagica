@@ -31,7 +31,7 @@ public class BlockAltar extends Block implements IRitualCore {
     private final AxisAlignedBB TOP_BOX = new AxisAlignedBB(0, -1, 0, 1, 1, 1);
 
     public BlockAltar() {
-        super(Material.rock);
+        super(Material.ROCK);
         this.setCreativeTab(ExoContent.TAB);
         this.setUnlocalizedName("altar");
         this.setHardness(1.5F);
@@ -191,9 +191,9 @@ public class BlockAltar extends Block implements IRitualCore {
         }
 
         if(state.getValue(BASE)) {
-            world.setBlockState(pos.up(), Blocks.air.getDefaultState());
+            world.setBlockState(pos.up(), Blocks.AIR.getDefaultState());
         } else {
-            world.setBlockState(pos.down(), Blocks.air.getDefaultState());
+            world.setBlockState(pos.down(), Blocks.AIR.getDefaultState());
         }
         super.breakBlock(world, pos, state);
     }

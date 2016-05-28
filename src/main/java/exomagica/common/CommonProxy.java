@@ -77,8 +77,8 @@ public class CommonProxy {
     }
 
     public void registerRecipes(IExoMagicaAPI api) {
-        api.registerRecipe("basic", new RitualBasicRecipe(new ItemStack(Items.elytra), Items.diamond,
-                Items.flint_and_steel, FluidRegistry.LAVA, Items.coal, Blocks.torch));
+        api.registerRecipe("basic", new RitualBasicRecipe(new ItemStack(Items.ELYTRA), Items.DIAMOND,
+                Items.FLINT_AND_STEEL, FluidRegistry.LAVA, Items.COAL, Blocks.TORCH));
     }
 
 

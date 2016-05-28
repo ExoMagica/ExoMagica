@@ -2,12 +2,10 @@ package exomagica.common.tiles;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -24,12 +22,13 @@ public class TileAltar extends TileEntity implements ISidedInventory {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
         NBTTagCompound item = new NBTTagCompound();
         if(stack != null && stack.stackSize > 0) stack.writeToNBT(item);
         compound.setTag("AltarItem", item);
+        return compound;
     }
 
     @Override
@@ -140,7 +139,7 @@ public class TileAltar extends TileEntity implements ISidedInventory {
     }
 
     @Override
-    public Packet<?> getDescriptionPacket() {
+    public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound nbt = new NBTTagCompound();
         writeToNBT(nbt);
         return new SPacketUpdateTileEntity(pos, 0, nbt);

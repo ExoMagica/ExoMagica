@@ -2,7 +2,6 @@ package exomagica.client.handlers;
 
 import exomagica.ExoMagica;
 import exomagica.client.particles.ExoFX;
-import java.util.ArrayDeque;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -10,6 +9,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayDeque;
 
 /**
  * This is based on Vazkii's particle dispatcher
@@ -120,7 +121,7 @@ public class ParticleRenderer {
             CUBE_PARTICLES.clear();
         }
 
-        tex.bindTexture(TextureMap.locationBlocksTexture);
+        tex.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
         if(!ITEM_CUBE_PARTICLES.isEmpty()) {
             for(ExoFX particle : ITEM_CUBE_PARTICLES) particle.renderExoParticle(partialTicks);

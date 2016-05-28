@@ -2,15 +2,16 @@ package exomagica.client.particles;
 
 import com.google.common.collect.Lists;
 import exomagica.client.particles.animation.IParticleAnimation;
-import java.util.ArrayDeque;
-import java.util.List;
-import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
-public class ExoFX extends EntityFX {
+import java.util.ArrayDeque;
+import java.util.List;
+
+public class ExoFX extends Particle {
 
     public static final ArrayDeque<ExoFX> PARTICLES = new ArrayDeque<ExoFX>();
 
@@ -88,7 +89,7 @@ public class ExoFX extends EntityFX {
 
             if(this.particleAge++ >= this.particleMaxAge) this.setExpired();
 
-            this.moveEntity(this.xSpeed, this.ySpeed, this.zSpeed);
+            this.moveEntity(this.motionX, this.motionY, this.motionZ);
             if(posX >= finalX - finalRange && posY >= finalY - finalRange && posZ >= finalZ - finalRange &&
                 posX <= finalX + finalRange && posY <= finalY + finalRange && posZ <= finalZ + finalRange) {
                 this.setExpired();
@@ -131,9 +132,9 @@ public class ExoFX extends EntityFX {
     }
 
     public void setSpeed(double x, double y, double z) {
-        this.xSpeed = x;
-        this.ySpeed = y;
-        this.zSpeed = z;
+        this.motionX = x;
+        this.motionY = y;
+        this.motionZ = z;
     }
 
     public void randomizeSpeed() {
@@ -141,10 +142,10 @@ public class ExoFX extends EntityFX {
     }
 
     @Override
-    public EntityFX multiplyVelocity(float multiplier) {
-        this.xSpeed *= multiplier;
-        this.ySpeed *= multiplier;
-        this.zSpeed *= multiplier;
+    public ExoFX multiplyVelocity(float multiplier) {
+        this.motionX *= multiplier;
+        this.motionY *= multiplier;
+        this.motionZ *= multiplier;
         return this;
     }
 
@@ -180,9 +181,9 @@ public class ExoFX extends EntityFX {
         this.finalX = x;
         this.finalY = y;
         this.finalZ = z;
-        this.xSpeed = (x - posX) * speed;
-        this.ySpeed = (y - posY) * speed;
-        this.zSpeed = (z - posZ) * speed;
+        this.motionX = (x - posX) * speed;
+        this.motionY = (y - posY) * speed;
+        this.motionZ = (z - posZ) * speed;
         this.finalRange = speed * 2;
         this.hasFinalCoords = true;
         this.particleMaxAge = maxAge;

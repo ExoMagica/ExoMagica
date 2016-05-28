@@ -7,8 +7,6 @@ import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.client.sounds.SoundRitualLoop;
 import exomagica.client.utils.ClientUtils;
 import exomagica.common.handlers.RitualHandler;
-import java.util.List;
-import java.util.Map;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -25,6 +23,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
+import java.util.Map;
 
 public class EntityRitual extends Entity {
 
@@ -44,21 +45,21 @@ public class EntityRitual extends Entity {
     public EntityRitual(World world) {
         super(world);
         this.container = null;
-        this.dataWatcher.register(RITUAL, new BlockPos(this));
-        this.dataWatcher.register(RECIPE, "");
-        this.dataWatcher.register(TICKS_LEFT, 0);
-        this.dataWatcher.register(TOTAL_TICKS, 100);
-        this.dataWatcher.register(SUCCESS, false);
+        this.dataManager.register(RITUAL, new BlockPos(this));
+        this.dataManager.register(RECIPE, "");
+        this.dataManager.register(TICKS_LEFT, 0);
+        this.dataManager.register(TOTAL_TICKS, 100);
+        this.dataManager.register(SUCCESS, false);
     }
 
     public EntityRitual(World world, RitualRecipeContainer container) {
         super(world);
         this.container = container;
-        this.dataWatcher.register(RITUAL, container.pos);
-        this.dataWatcher.register(RECIPE, RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
-        this.dataWatcher.register(TICKS_LEFT, container.ticksLeft);
-        this.dataWatcher.register(TOTAL_TICKS, container.totalTicks);
-        this.dataWatcher.register(SUCCESS, false);
+        this.dataManager.register(RITUAL, container.pos);
+        this.dataManager.register(RECIPE, RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
+        this.dataManager.register(TICKS_LEFT, container.ticksLeft);
+        this.dataManager.register(TOTAL_TICKS, container.totalTicks);
+        this.dataManager.register(SUCCESS, false);
         this.setPosition(container.pos.getX() + 0.5, container.pos.getY() + 0.5, container.pos.getZ() + 0.5);
     }
 
@@ -142,7 +143,7 @@ public class EntityRitual extends Entity {
             if(RitualHandler.checkRecipe(container.ritual, container.recipe, container.inventories) &&
                     container.ritual.checkPattern(container.core, container.world, container.pos)) {
                 success = true;
-                this.dataWatcher.set(SUCCESS, success);
+                this.dataManager.set(SUCCESS, success);
             } else {
                 success = false;
                 setDead();
@@ -152,28 +153,28 @@ public class EntityRitual extends Entity {
 
         container.ritual.tickRitual(container, side);
 
-        boolean wasDirty = dataWatcher.isDirty();
-        this.dataWatcher.set(TICKS_LEFT, container.ticksLeft);
+        boolean wasDirty = dataManager.isDirty();
+        this.dataManager.set(TICKS_LEFT, container.ticksLeft);
         // Prevent the server from sending a metadata packet each regular tick
         // but at the same time, keep the data watcher with updated data
-        if(!wasDirty) this.dataWatcher.setClean();
+        if(!wasDirty) this.dataManager.setClean();
     }
 
     @Override
     public void notifyDataManagerChange(DataParameter<?> key) {
         super.notifyDataManagerChange(key);
         if(key == SUCCESS) {
-            success = dataWatcher.get(SUCCESS).booleanValue();
+            success = dataManager.get(SUCCESS).booleanValue();
         } else if(container == null) {
 
-            if(dataWatcher.get(RITUAL) != null && dataWatcher.get(RECIPE) != null &&
-                    dataWatcher.get(TOTAL_TICKS) != null) {
-                loadFromData(dataWatcher.get(RITUAL), dataWatcher.get(RECIPE),
-                        dataWatcher.get(TOTAL_TICKS), dataWatcher.get(TICKS_LEFT), true);
+            if(dataManager.get(RITUAL) != null && dataManager.get(RECIPE) != null &&
+                    dataManager.get(TOTAL_TICKS) != null) {
+                loadFromData(dataManager.get(RITUAL), dataManager.get(RECIPE),
+                        dataManager.get(TOTAL_TICKS), dataManager.get(TICKS_LEFT), true);
             }
 
         } else if(key == TICKS_LEFT) {
-            container.ticksLeft = dataWatcher.get(TICKS_LEFT).intValue();
+            container.ticksLeft = dataManager.get(TICKS_LEFT).intValue();
         }
     }
 
@@ -227,11 +228,11 @@ public class EntityRitual extends Entity {
         container.ticksLeft = ticksLeft;
 
         if(setDW) {
-            this.dataWatcher.set(RITUAL, container.pos);
-            this.dataWatcher.set(RECIPE, RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
-            this.dataWatcher.set(TICKS_LEFT, container.ticksLeft);
-            this.dataWatcher.set(TOTAL_TICKS, container.totalTicks);
-            this.dataWatcher.set(SUCCESS, false);
+            this.dataManager.set(RITUAL, container.pos);
+            this.dataManager.set(RECIPE, RitualHandler.getRitualRecipeName(container.ritual, container.recipe));
+            this.dataManager.set(TICKS_LEFT, container.ticksLeft);
+            this.dataManager.set(TOTAL_TICKS, container.totalTicks);
+            this.dataManager.set(SUCCESS, false);
         }
 
         isDead = false; // If everything was loaded correctly, keep it spawned
@@ -256,8 +257,9 @@ public class EntityRitual extends Entity {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompund) {
+    public NBTTagCompound writeToNBT(NBTTagCompound tagCompund) {
         if(container != null) super.writeToNBT(tagCompund);
+        return tagCompund;
     }
 
     public RitualRecipeContainer getContainer() {
@@ -265,7 +267,7 @@ public class EntityRitual extends Entity {
     }
 
     public void finishRitual(boolean success) {
-        this.dataWatcher.set(SUCCESS, success);
+        this.dataManager.set(SUCCESS, success);
         this.success = success;
         if(!success) setDead();
     }

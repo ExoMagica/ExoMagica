@@ -2,7 +2,6 @@ package exomagica.common.blocks;
 
 import exomagica.ExoContent;
 import exomagica.ExoSounds;
-import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -24,18 +23,20 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.List;
+
 public class BlockChalk extends Block implements IBlockColor {
 
     public static final PropertyEnum<ChalkType> TYPE = PropertyEnum.create("type", ChalkType.class);
 
-    private final SoundType SOUND = new SoundType(1, 1, SoundEvents.block_sand_break, SoundEvents.block_sand_step,
-                                    ExoSounds.CHALK_PLACE, SoundEvents.block_sand_hit, SoundEvents.block_sand_fall);
+    private final SoundType SOUND = new SoundType(1, 1, SoundEvents.BLOCK_SAND_BREAK, SoundEvents.BLOCK_SAND_STEP,
+                                    ExoSounds.CHALK_PLACE, SoundEvents.BLOCK_SAND_HIT, SoundEvents.BLOCK_SAND_FALL);
 
     private final AxisAlignedBB box;
 
     public BlockChalk() {
-        super(Material.circuits);
-        this.setStepSound(SOUND);
+        super(Material.CIRCUITS);
+        this.setSoundType(SOUND);
         this.setUnlocalizedName("chalk");
         box = new AxisAlignedBB(0F, 0.0F, 0F, 1F, 0.0625F, 1F);
         this.setLightOpacity(0);

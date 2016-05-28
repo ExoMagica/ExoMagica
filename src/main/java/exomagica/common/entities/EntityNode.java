@@ -24,13 +24,13 @@ public class EntityNode extends Entity implements INode {
 
     public EntityNode(World w) {
         super(w);
-        this.dataWatcher.register(AURA, "");
+        this.dataManager.register(AURA, "");
     }
 
     public EntityNode(World w, IAura aura) {
         super(w);
         this.aura = aura;
-        this.dataWatcher.register(AURA, NodeHandler.getAuraName(aura));
+        this.dataManager.register(AURA, NodeHandler.getAuraName(aura));
     }
 
     @Override
@@ -80,7 +80,7 @@ public class EntityNode extends Entity implements INode {
     @Override
     public void notifyDataManagerChange(DataParameter<?> key) {
         if(key == AURA) {
-            this.aura = NodeHandler.findAura(dataWatcher.get(AURA));
+            this.aura = NodeHandler.findAura(dataManager.get(AURA));
         }
     }
 

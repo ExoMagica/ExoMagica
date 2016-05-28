@@ -14,13 +14,9 @@ import exomagica.client.particles.animation.RotateAnimation;
 import exomagica.common.blocks.BlockChalk;
 import exomagica.common.blocks.BlockChalk.ChalkType;
 import exomagica.common.tiles.TileAltar;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -29,6 +25,11 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import scala.actors.threadpool.Arrays;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // "BASIC"????? Yep, we are not creative enough for these names :D
 // WHY DON'T YOU SUGGEST SOME?
@@ -114,7 +115,7 @@ public class RitualBasic implements IRitual {
         boolean finish = c.recipe.finishRecipe(this);
         if(side == Side.CLIENT) {
             if(finish) {
-                EffectRenderer renderer = Minecraft.getMinecraft().effectRenderer;
+                ParticleManager renderer = Minecraft.getMinecraft().effectRenderer;
 
                 spawnTwinkleParticles(renderer, (World)c.world, c.pos.getX() + 0.5, c.pos.getY() + 1.75, c.pos.getZ() + 0.5);
 
@@ -128,7 +129,7 @@ public class RitualBasic implements IRitual {
         return finish;
     }
 
-    private void spawnTwinkleParticles(EffectRenderer renderer, World w, double x, double y, double z) {
+    private void spawnTwinkleParticles(ParticleManager renderer, World w, double x, double y, double z) {
         for(int i = 0; i < 5; i++) {
             TwinkleFX fx = new TwinkleFX(w, x, y, z, true);
             fx.setOffset((Math.random() * 0.4) - 0.2, (Math.random() * 0.4) - 0.2, (Math.random() * 0.4) - 0.2);
@@ -147,7 +148,7 @@ public class RitualBasic implements IRitual {
     @Override
     public void tickRitual(RitualRecipeContainer c, Side side) {
         if(side == Side.CLIENT && c.ticksLeft > 35) {
-            EffectRenderer renderer = Minecraft.getMinecraft().effectRenderer;
+            ParticleManager renderer = Minecraft.getMinecraft().effectRenderer;
             for(EnumFacing facing : EnumFacing.HORIZONTALS) {
                 BlockPos pos = c.pos.offset(facing, 3);
 

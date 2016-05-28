@@ -10,13 +10,6 @@ import exomagica.api.ritual.IRitualRecipe;
 import exomagica.api.ritual.RitualRecipeContainer;
 import exomagica.common.entities.EntityRitual;
 import exomagica.common.utils.ItemUtils;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -32,6 +25,8 @@ import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.util.*;
 
 public class RitualHandler {
 
@@ -110,7 +105,7 @@ public class RitualHandler {
         ItemStack stack = event.getItemStack();
         if(stack == null) return;
         Item item = stack.getItem();
-        if(item == Items.stick) {
+        if(item == Items.STICK) {
 
         } else if(item instanceof IWand) {
 

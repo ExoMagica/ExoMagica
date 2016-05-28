@@ -15,7 +15,7 @@ public class RadialFX extends ExoFX {
         this.particleGreen = g;
         this.particleBlue = b;
         this.particleAlpha = (rand.nextFloat() * 0.75F) + 0.3F;
-        this.ySpeed = 0.05F;
+        this.motionY = 0.05F;
     }
 
 }
